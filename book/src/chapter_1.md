@@ -1,1 +1,64 @@
-# Chapter 1
+# 1. 背景知识
+
+## Brainfuck 简介
+
+<https://en.wikipedia.org/wiki/Brainfuck>
+
+Brainfuck 仅包含八个指令，却是图灵完备的，理论上它可以做到任何用图灵机能做到的事情。
+
+机器模型：一个字节数组，一个数据指针，一个指令指针，输入流，输出流。
+
+数组初始化为全零，数据指针初始时指向数组的第一个字节，指令指针指向第一条指令。
+
+字符 '>'：将数据指针加一。
+
+字符 '<'：将数据指针减一。
+
+字符 '+'：将数据指针所指的单元加一。
+
+字符 '-'：将数据指针所指的单元减一。
+
+字符 ','：从输入流中读取一个字节，存入数据指针所指单元。
+
+字符 '.'：输出数据指针所指单元的字节。
+
+字符 '['：如果当前单元是 0，那么跳转到对应的 ']' 的下一条指令，否则继续执行。
+
+字符 ']'：如果当前单元不是 0，那么跳转到对应的 '[' 的下一条指令，否则继续执行。
+
+
+Brainfuck 可以直接对应到 C 代码，仅用几十行就能写个从 bf 到 c 的编译器。
+
+初始化
+
+```c
+char array[30000] = {0};
+char *ptr=array;
+```
+
+| 指令 | C 代码          |
+| ---- | --------------- |
+| >    | ++ptr;          |
+| <    | --ptr;          |
+| +    | ++*ptr;         |
+| -    | --*ptr;         |
+| .    | putchar(*ptr);  |
+| ,    | *ptr=getchar(); |
+| [    | while (*ptr) {  |
+| ]    | }               |
+
+Brainfuck 可视化
+
+<http://fatiherikli.github.io/brainfuck-visualizer/>
+
+## Rust 资源
+
+Rust 官网 <https://www.rust-lang.org/>
+
+Rust 一键安装 <https://rustup.rs/>
+
+Rust 并不是一个能立即上手的语言，如果您是一位 Rust 新手，最好先全面了解 Rust 语言特性。
+
+Rust 官网入门教程 <https://www.rust-lang.org/zh-CN/learn>
+
+中文书《Rust编程之道》 <https://book.douban.com/subject/30418895/>
