@@ -1,6 +1,7 @@
 #![feature(proc_macro_hygiene)]
 
 mod bfir;
+mod error;
 
 use dynasm::dynasm;
 use dynasmrt::{DynasmApi, DynasmLabelApi};
