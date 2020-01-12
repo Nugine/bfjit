@@ -8,8 +8,15 @@ use dynasmrt::{DynasmApi, DynasmLabelApi};
 use std::io::{stdout, Write};
 
 unsafe extern "sysv64" fn print(buf: *const u8, len: u64) -> u8 {
-    let buf = std::slice::from_raw_parts(buf, len as usize);
-    stdout().write_all(buf).is_err() as u8
+    let ret = std::panic::catch_unwind(|| {
+        let buf = std::slice::from_raw_parts(buf, len as usize);
+        stdout().write_all(buf).is_err()
+    });
+    match ret {
+        Ok(false) => 0,
+        Ok(true) => 1,
+        Err(_) => 2,
+    }
 }
 
 fn main() {
