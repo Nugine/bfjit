@@ -1,0 +1,9 @@
+[book]
+authors = ["Nugine"]
+language = "zh-CN"
+multilingual = false
+src = "src"
+title = "Brainfuck JIT 虚拟机教程"
+
+[build]
+build-dir = "../docs"
