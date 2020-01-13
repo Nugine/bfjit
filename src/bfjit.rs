@@ -111,7 +111,7 @@ impl<'io> BfVM<'io> {
         // ptr:          rcx [rsp]
 
         dynasm!(ops
-            ; sub rsp, 0x20         // stack allocation
+            ; sub rsp, 0x28         // stack allocation
             ; mov [rsp+0x18], rdi   // save this
             ; mov [rsp+0x10], rsi   // save memory_start
             ; mov [rsp+0x08], rdx   // save memory_end
@@ -186,16 +186,15 @@ impl<'io> BfVM<'io> {
         }
 
         dynasm!(ops
-            ; add rsp, 0x20 // stack deallocation
-            ; xor rax, rax  // rax = 0
-            ; ret
+            ; xor rax, rax
+            ; jmp >exit
             ; -> overflow:
-            ; add rsp, 0x20
             ; mov rax, QWORD BfVM::overflow_error as _
-            ; call rax      // rax = overflow_error()
-            ; ret
+            ; call rax
+            ; jmp >exit
             ; -> io_error:
-            ; add rsp, 0x20
+            ; exit:
+            ; add rsp, 0x28
             ; ret
         );
 
