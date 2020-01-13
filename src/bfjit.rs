@@ -105,17 +105,17 @@ impl<'io> BfVM<'io> {
 
         let mut loops = vec![];
 
-        // this:         rdi [rsp+0x18]
-        // memory_start: rsi [rsp+0x10]
-        // memory_end:   rdx [rsp+0x08]
-        // ptr:          rcx [rsp]
+        // this:         rdi r12
+        // memory_start: rsi r13
+        // memory_end:   rdx r14
+        // ptr:          rcx r15
 
         dynasm!(ops
-            ; sub rsp, 0x28         // stack allocation
-            ; mov [rsp+0x18], rdi   // save this
-            ; mov [rsp+0x10], rsi   // save memory_start
-            ; mov [rsp+0x08], rdx   // save memory_end
-            ; mov rcx, rsi          // ptr = memory_start
+            ; push rax  
+            ; mov r12, rdi   // save this
+            ; mov r13, rsi   // save memory_start
+            ; mov r14, rdx   // save memory_end
+            ; mov rcx, rsi   // ptr = memory_start
         );
 
         use BfIR::*;
@@ -124,44 +124,40 @@ impl<'io> BfVM<'io> {
                 AddPtr(x) => dynasm!(ops
                     ; add rcx, x as i32     // ptr += x
                     ; jc  ->overflow        // jmp if overflow
-                    ; cmp rcx, rdx          // ptr - memory_end
+                    ; cmp rcx, r14          // ptr - memory_end
                     ; jnb ->overflow        // jmp if ptr >= memory_end
                 ),
                 SubPtr(x) => dynasm!(ops
                     ; sub rcx, x as i32     // ptr -= x
                     ; jc  ->overflow        // jmp if overflow
-                    ; cmp rcx, rsi          // ptr - memory_start
+                    ; cmp rcx, r13          // ptr - memory_start
                     ; jb  ->overflow        // jmp if ptr < memory_start
                 ),
                 AddVal(x) => dynasm!(ops
                     ; add BYTE [rcx], x as i8    // *ptr += x
                 ),
                 SubVal(x) => dynasm!(ops
-                    ; sub BYTE [rcx], x as i8     // *ptr -= x
+                    ; sub BYTE [rcx], x as i8    // *ptr -= x
                 ),
                 GetByte => dynasm!(ops
-                    ; mov  [rsp], rcx       // save ptr
+                    ; mov  r15, rcx         // save ptr
+                    ; mov  rdi, r12
                     ; mov  rsi, rcx         // arg0: this, arg1: ptr
                     ; mov  rax, QWORD BfVM::getbyte as _
                     ; call rax              // getbyte(this, ptr)
                     ; test rax, rax
                     ; jnz  ->io_error       // jmp if rax != 0
-                    ; mov rdi, [rsp+0x18]   // recover this
-                    ; mov rsi, [rsp+0x10]   // recover memory_start
-                    ; mov rdx, [rsp+0x08]   // recover memory_end
-                    ; mov rcx, [rsp]        // recover ptr
+                    ; mov  rcx, r15         // recover ptr
                 ),
                 PutByte => dynasm!(ops
-                    ; mov  [rsp], rcx       // save ptr
+                    ; mov  r15, rcx         // save ptr
+                    ; mov  rdi, r12
                     ; mov  rsi, rcx         // arg0: this, arg1: ptr
                     ; mov  rax, QWORD BfVM::putbyte as _
                     ; call rax              // putbyte(this, ptr)
                     ; test rax, rax
                     ; jnz  ->io_error       // jmp if rax != 0
-                    ; mov rdi, [rsp+0x18]   // recover this
-                    ; mov rsi, [rsp+0x10]   // recover memory_start
-                    ; mov rdx, [rsp+0x08]   // recover memory_end
-                    ; mov rcx, [rsp]        // recover ptr
+                    ; mov  rcx, r15         // recover ptr
                 ),
                 Jz(_) => {
                     let left = ops.new_dynamic_label();
@@ -194,7 +190,7 @@ impl<'io> BfVM<'io> {
             ; jmp >exit
             ; -> io_error:
             ; exit:
-            ; add rsp, 0x28
+            ; pop rdx
             ; ret
         );
 
