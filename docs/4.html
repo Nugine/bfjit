@@ -5,22 +5,36 @@
         <meta charset="UTF-8">
         <title>4. Hello, JIT - Brainfuck JIT 虚拟机教程</title>
         
+        
+
+
+        <!-- Custom HTML head -->
+        
+
 
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff" />
 
+        
+        <link rel="icon" href="favicon.svg">
+        
+        
         <link rel="shortcut icon" href="favicon.png">
+        
         <link rel="stylesheet" href="css/variables.css">
         <link rel="stylesheet" href="css/general.css">
         <link rel="stylesheet" href="css/chrome.css">
+        
         <link rel="stylesheet" href="css/print.css" media="print">
+        
 
         <!-- Fonts -->
         <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
-        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
-        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+        
+        <link rel="stylesheet" href="fonts/fonts.css">
+        
 
         <!-- Highlight.js Stylesheets -->
         <link rel="stylesheet" href="highlight.css">
@@ -36,7 +50,7 @@
         <!-- Provide site root to javascript -->
         <script type="text/javascript">
             var path_to_root = "";
-            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "light" : "light";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
         </script>
 
         <!-- Work around some values being stored in localStorage wrapped in quotes -->
@@ -80,8 +94,8 @@
         </script>
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
-            <div id="sidebar-scrollbox" class="sidebar-scrollbox">
-                <ol class="chapter"><li class="expanded affix "><a href="introduction.html">介绍</a></li><li class="expanded "><a href="1.html"><strong aria-hidden="true">1.</strong> 背景知识</a></li><li class="expanded "><a href="2.html"><strong aria-hidden="true">2.</strong> 启动项目</a></li><li class="expanded "><a href="3.html"><strong aria-hidden="true">3.</strong> 中间表示</a></li><li class="expanded "><a href="4.html" class="active"><strong aria-hidden="true">4.</strong> Hello, JIT</a></li><li class="expanded "><a href="5.html"><strong aria-hidden="true">5.</strong> 来点错误</a></li><li class="expanded "><a href="6.html"><strong aria-hidden="true">6.</strong> 实现虚拟机</a></li><li class="expanded "><a href="7.html"><strong aria-hidden="true">7.</strong> 生成机器码</a></li><li class="expanded "><a href="8.html"><strong aria-hidden="true">8.</strong> 命令行界面</a></li><li class="expanded affix "><a href="conclusion.html">结语</a></li></ol>
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="introduction.html">介绍</a></li><li class="chapter-item expanded "><a href="1.html"><strong aria-hidden="true">1.</strong> 背景知识</a></li><li class="chapter-item expanded "><a href="2.html"><strong aria-hidden="true">2.</strong> 启动项目</a></li><li class="chapter-item expanded "><a href="3.html"><strong aria-hidden="true">3.</strong> 中间表示</a></li><li class="chapter-item expanded "><a href="4.html" class="active"><strong aria-hidden="true">4.</strong> Hello, JIT</a></li><li class="chapter-item expanded "><a href="5.html"><strong aria-hidden="true">5.</strong> 来点错误</a></li><li class="chapter-item expanded "><a href="6.html"><strong aria-hidden="true">6.</strong> 实现虚拟机</a></li><li class="chapter-item expanded "><a href="7.html"><strong aria-hidden="true">7.</strong> 生成机器码</a></li><li class="chapter-item expanded "><a href="8.html"><strong aria-hidden="true">8.</strong> 命令行界面</a></li><li class="chapter-item expanded affix "><a href="conclusion.html">结语</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -90,37 +104,38 @@
 
             <div class="page">
                 
-                <div id="menu-bar" class="menu-bar">
-                    <div id="menu-bar-sticky-container">
-                        <div class="left-buttons">
-                            <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
-                                <i class="fa fa-bars"></i>
-                            </button>
-                            <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
-                                <i class="fa fa-paint-brush"></i>
-                            </button>
-                            <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
-                                <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
-                                <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
-                                <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
-                                <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
-                                <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
-                            </ul>
-                            
-                            <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
-                                <i class="fa fa-search"></i>
-                            </button>
-                            
-                        </div>
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
 
-                        <h1 class="menu-title">Brainfuck JIT 虚拟机教程</h1>
+                    <h1 class="menu-title">Brainfuck JIT 虚拟机教程</h1>
 
-                        <div class="right-buttons">
-                            <a href="print.html" title="Print this book" aria-label="Print this book">
-                                <i id="print-button" class="fa fa-print"></i>
-                            </a>
-                            
-                        </div>
+                    <div class="right-buttons">
+                        
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                        
                     </div>
                 </div>
 
@@ -148,7 +163,7 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#4-hello-jit" id="4-hello-jit">4. Hello, JIT</a></h1>
+                        <h1 id="4-hello-jit"><a class="header" href="#4-hello-jit">4. Hello, JIT</a></h1>
 <p>通常来说，Just In Time (JIT) 编译器 是指在某段高阶代码即将运行时将其编译到机器码再执行的程序。下文中，我们把这样的程序叫做 &quot;JIT&quot;。</p>
 <p>一个最简单的 JIT 工作方式是这样的：</p>
 <ol>
@@ -194,20 +209,14 @@ int main(int argc, char *argv[]) {
 </code></pre>
 <p>编写 JIT 的一大难点是如何生成机器码，这里通常有跨平台问题、可读性消失问题。</p>
 <p>最笨的方法：写一段汇编，用汇编器生成机器码，再复制到高级代码里。但这样不具有通用性，开发效率非常低。</p>
-<h2><a class="header" href="#dynasm" id="dynasm">dynasm</a></h2>
+<h2 id="dynasm"><a class="header" href="#dynasm">dynasm</a></h2>
 <p><a href="http://luajit.org/dynasm.html">DynAsm</a> 是 LuaJIT 的一部分，它用预处理器把混合汇编的 C 文件转换成 纯 C 文件，还包含一个微型运行时，用来执行运行时工作。</p>
 <p><a href="https://crates.io/crates/dynasm">dynasm-rs</a> 是对应的 Rust 实现，用过程宏在编译期解析汇编语法，也包含微型运行时。</p>
 <p>Rust 过程宏作为编译器插件几乎是万能的，不光是汇编，html、shell、cpp 等语言都能嵌入，转换成对应的 Rust 结构，给人一种相当纯粹的感觉。过程宏还有很多用途，感兴趣的可以自行研究。</p>
 <pre><code class="language-bash">cargo add dynasm dynasmrt
-echo nightly &gt; rust-toolchain
 </code></pre>
-<p>卫生过程宏还没有稳定，目前只能在 nightly 版本用。如果没有 nightly 工具链，用以下命令安装。</p>
-<pre><code class="language-bash">rustup toolchain install nightly
-</code></pre>
-<p>修改 main.rs，启用卫生过程宏，导入 dynasm.</p>
-<pre><code class="language-rust noplaypen">#![feature(proc_macro_hygiene)]
-
-mod bfir;
+<p>修改 main.rs，导入 dynasm.</p>
+<pre><code class="language-rust noplaypen">mod bfir;
 
 use dynasm::dynasm;
 use dynasmrt::{DynasmApi, DynasmLabelApi};
@@ -261,9 +270,7 @@ use std::io::{stdout, Write};
 Hello, JIT!
 </code></pre>
 <p>完整代码</p>
-<pre><code class="language-rust noplaypen">#![feature(proc_macro_hygiene)]
-
-mod bfir;
+<pre><code class="language-rust noplaypen">mod bfir;
 
 use dynasm::dynasm;
 use dynasmrt::{DynasmApi, DynasmLabelApi};
@@ -304,12 +311,12 @@ fn main() {
     assert_eq!(ret, 0);
 }
 </code></pre>
-<h2><a class="header" href="#如何处理-panic" id="如何处理-panic">如何处理 panic</a></h2>
+<h2 id="如何处理-panic"><a class="header" href="#如何处理-panic">如何处理 panic</a></h2>
 <p>跨越 Rust 边界的 panic 是未定义行为，我们很难让汇编去匹配 unwind ABI。</p>
 <p>暴露给外部调用的 Rust 函数最好捕获 panic，用其他方式去处理。</p>
 <p>例如这样 </p>
-<pre><pre class="playpen"><code class="language-rust">
-<span class="boring">#![allow(unused_variables)]
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>unsafe extern &quot;sysv64&quot; fn print(buf: *const u8, len: u64) -&gt; u8 {
     let ret = std::panic::catch_unwind(|| {
@@ -348,13 +355,13 @@ fn main() {
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
                 
-                    <a href="3.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="3.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
                 
 
                 
-                    <a href="5.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="5.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
                 
@@ -367,10 +374,10 @@ fn main() {
         
 
         
-        
+
         
         <script type="text/javascript">
-            window.playpen_copyable = true;
+            window.playground_copyable = true;
         </script>
         
 

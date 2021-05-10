@@ -5,22 +5,36 @@
         <meta charset="UTF-8">
         <title>1. 背景知识 - Brainfuck JIT 虚拟机教程</title>
         
+        
+
+
+        <!-- Custom HTML head -->
+        
+
 
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff" />
 
+        
+        <link rel="icon" href="favicon.svg">
+        
+        
         <link rel="shortcut icon" href="favicon.png">
+        
         <link rel="stylesheet" href="css/variables.css">
         <link rel="stylesheet" href="css/general.css">
         <link rel="stylesheet" href="css/chrome.css">
+        
         <link rel="stylesheet" href="css/print.css" media="print">
+        
 
         <!-- Fonts -->
         <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
-        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
-        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+        
+        <link rel="stylesheet" href="fonts/fonts.css">
+        
 
         <!-- Highlight.js Stylesheets -->
         <link rel="stylesheet" href="highlight.css">
@@ -36,7 +50,7 @@
         <!-- Provide site root to javascript -->
         <script type="text/javascript">
             var path_to_root = "";
-            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "light" : "light";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
         </script>
 
         <!-- Work around some values being stored in localStorage wrapped in quotes -->
@@ -80,8 +94,8 @@
         </script>
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
-            <div id="sidebar-scrollbox" class="sidebar-scrollbox">
-                <ol class="chapter"><li class="expanded affix "><a href="introduction.html">介绍</a></li><li class="expanded "><a href="1.html" class="active"><strong aria-hidden="true">1.</strong> 背景知识</a></li><li class="expanded "><a href="2.html"><strong aria-hidden="true">2.</strong> 启动项目</a></li><li class="expanded "><a href="3.html"><strong aria-hidden="true">3.</strong> 中间表示</a></li><li class="expanded "><a href="4.html"><strong aria-hidden="true">4.</strong> Hello, JIT</a></li><li class="expanded "><a href="5.html"><strong aria-hidden="true">5.</strong> 来点错误</a></li><li class="expanded "><a href="6.html"><strong aria-hidden="true">6.</strong> 实现虚拟机</a></li><li class="expanded "><a href="7.html"><strong aria-hidden="true">7.</strong> 生成机器码</a></li><li class="expanded "><a href="8.html"><strong aria-hidden="true">8.</strong> 命令行界面</a></li><li class="expanded affix "><a href="conclusion.html">结语</a></li></ol>
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="introduction.html">介绍</a></li><li class="chapter-item expanded "><a href="1.html" class="active"><strong aria-hidden="true">1.</strong> 背景知识</a></li><li class="chapter-item expanded "><a href="2.html"><strong aria-hidden="true">2.</strong> 启动项目</a></li><li class="chapter-item expanded "><a href="3.html"><strong aria-hidden="true">3.</strong> 中间表示</a></li><li class="chapter-item expanded "><a href="4.html"><strong aria-hidden="true">4.</strong> Hello, JIT</a></li><li class="chapter-item expanded "><a href="5.html"><strong aria-hidden="true">5.</strong> 来点错误</a></li><li class="chapter-item expanded "><a href="6.html"><strong aria-hidden="true">6.</strong> 实现虚拟机</a></li><li class="chapter-item expanded "><a href="7.html"><strong aria-hidden="true">7.</strong> 生成机器码</a></li><li class="chapter-item expanded "><a href="8.html"><strong aria-hidden="true">8.</strong> 命令行界面</a></li><li class="chapter-item expanded affix "><a href="conclusion.html">结语</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -90,37 +104,38 @@
 
             <div class="page">
                 
-                <div id="menu-bar" class="menu-bar">
-                    <div id="menu-bar-sticky-container">
-                        <div class="left-buttons">
-                            <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
-                                <i class="fa fa-bars"></i>
-                            </button>
-                            <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
-                                <i class="fa fa-paint-brush"></i>
-                            </button>
-                            <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
-                                <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
-                                <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
-                                <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
-                                <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
-                                <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
-                            </ul>
-                            
-                            <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
-                                <i class="fa fa-search"></i>
-                            </button>
-                            
-                        </div>
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
 
-                        <h1 class="menu-title">Brainfuck JIT 虚拟机教程</h1>
+                    <h1 class="menu-title">Brainfuck JIT 虚拟机教程</h1>
 
-                        <div class="right-buttons">
-                            <a href="print.html" title="Print this book" aria-label="Print this book">
-                                <i id="print-button" class="fa fa-print"></i>
-                            </a>
-                            
-                        </div>
+                    <div class="right-buttons">
+                        
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                        
                     </div>
                 </div>
 
@@ -148,8 +163,8 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#1-背景知识" id="1-背景知识">1. 背景知识</a></h1>
-<h2><a class="header" href="#brainfuck-简介" id="brainfuck-简介">Brainfuck 简介</a></h2>
+                        <h1 id="1-背景知识"><a class="header" href="#1-背景知识">1. 背景知识</a></h1>
+<h2 id="brainfuck-简介"><a class="header" href="#brainfuck-简介">Brainfuck 简介</a></h2>
 <p><a href="https://en.wikipedia.org/wiki/Brainfuck">https://en.wikipedia.org/wiki/Brainfuck</a></p>
 <p>Brainfuck 仅包含八个指令，却是图灵完备的，理论上它可以做到任何用图灵机能做到的事情。</p>
 <p>机器模型：一个字节数组，一个数据指针，一个指令指针，输入流，输出流。</p>
@@ -179,7 +194,7 @@ char *ptr=array;
 </tbody></table>
 <p>Brainfuck 可视化</p>
 <p><a href="http://fatiherikli.github.io/brainfuck-visualizer/">http://fatiherikli.github.io/brainfuck-visualizer/</a></p>
-<h2><a class="header" href="#rust-资源" id="rust-资源">Rust 资源</a></h2>
+<h2 id="rust-资源"><a class="header" href="#rust-资源">Rust 资源</a></h2>
 <p>Rust 官网 <a href="https://www.rust-lang.org/">https://www.rust-lang.org/</a></p>
 <p>Rust 一键安装 <a href="https://rustup.rs/">https://rustup.rs/</a></p>
 <p>Rust 并不是一个能立即上手的语言，如果您是一位 Rust 新手，最好先全面了解 Rust 语言特性。</p>
@@ -209,13 +224,13 @@ char *ptr=array;
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
                 
-                    <a href="introduction.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="introduction.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
                 
 
                 
-                    <a href="2.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="2.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
                 
@@ -228,10 +243,10 @@ char *ptr=array;
         
 
         
-        
+
         
         <script type="text/javascript">
-            window.playpen_copyable = true;
+            window.playground_copyable = true;
         </script>
         
 

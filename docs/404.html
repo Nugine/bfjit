@@ -3,8 +3,10 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>5. 来点错误 - Brainfuck JIT 虚拟机教程</title>
+        <title></title>
         
+        
+        <base href="/">
         
 
 
@@ -95,7 +97,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="introduction.html">介绍</a></li><li class="chapter-item expanded "><a href="1.html"><strong aria-hidden="true">1.</strong> 背景知识</a></li><li class="chapter-item expanded "><a href="2.html"><strong aria-hidden="true">2.</strong> 启动项目</a></li><li class="chapter-item expanded "><a href="3.html"><strong aria-hidden="true">3.</strong> 中间表示</a></li><li class="chapter-item expanded "><a href="4.html"><strong aria-hidden="true">4.</strong> Hello, JIT</a></li><li class="chapter-item expanded "><a href="5.html" class="active"><strong aria-hidden="true">5.</strong> 来点错误</a></li><li class="chapter-item expanded "><a href="6.html"><strong aria-hidden="true">6.</strong> 实现虚拟机</a></li><li class="chapter-item expanded "><a href="7.html"><strong aria-hidden="true">7.</strong> 生成机器码</a></li><li class="chapter-item expanded "><a href="8.html"><strong aria-hidden="true">8.</strong> 命令行界面</a></li><li class="chapter-item expanded affix "><a href="conclusion.html">结语</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="introduction.html">介绍</a></li><li class="chapter-item expanded "><a href="1.html"><strong aria-hidden="true">1.</strong> 背景知识</a></li><li class="chapter-item expanded "><a href="2.html"><strong aria-hidden="true">2.</strong> 启动项目</a></li><li class="chapter-item expanded "><a href="3.html"><strong aria-hidden="true">3.</strong> 中间表示</a></li><li class="chapter-item expanded "><a href="4.html"><strong aria-hidden="true">4.</strong> Hello, JIT</a></li><li class="chapter-item expanded "><a href="5.html"><strong aria-hidden="true">5.</strong> 来点错误</a></li><li class="chapter-item expanded "><a href="6.html"><strong aria-hidden="true">6.</strong> 实现虚拟机</a></li><li class="chapter-item expanded "><a href="7.html"><strong aria-hidden="true">7.</strong> 生成机器码</a></li><li class="chapter-item expanded "><a href="8.html"><strong aria-hidden="true">8.</strong> 命令行界面</a></li><li class="chapter-item expanded affix "><a href="conclusion.html">结语</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -163,52 +165,15 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="5-来点错误"><a class="header" href="#5-来点错误">5. 来点错误</a></h1>
-<p>添加一个错误模块</p>
-<p>src/main.rs</p>
-<pre><code class="language-rust noplaypen">mod error;
-</code></pre>
-<p>src/error.rs</p>
-<pre><code class="language-rust noplaypen">#[derive(Debug, thiserror::Error)]
-pub enum RuntimeError {
-    #[error(&quot;IO: {0}&quot;)]
-    IO(#[from] std::io::Error),
-
-    #[error(&quot;Pointer overflow&quot;)]
-    PointerOverflow,
-}
-
-#[derive(Debug, thiserror::Error)]
-pub enum VMError {
-    #[error(&quot;IO: {0}&quot;)]
-    IO(#[from] std::io::Error),
-
-    #[error(&quot;Compile: {0}&quot;)]
-    Compile(#[from] crate::bfir::CompileError),
-
-    #[error(&quot;Runtime: {0}&quot;)]
-    Runtime(#[from] RuntimeError),
-}
-
-pub type Result&lt;T&gt; = std::result::Result&lt;T, VMError&gt;;
-</code></pre>
-<p>虚拟机运行时可能出现两种错误，IO 错误和指针溢出。</p>
-<p>虚拟机首先需要读取源代码，可能出现IO错误，然后将源代码编译为 IR，可能发生编译错误，最后运行程序，可能有运行时错误。</p>
+                        <h1 id="document-not-found-404"><a class="header" href="#document-not-found-404">Document not found (404)</a></h1>
+<p>This URL is invalid, sorry. Please use the navigation bar or search to continue.</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
                         
-                            <a rel="prev" href="4.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
-                                <i class="fa fa-angle-left"></i>
-                            </a>
-                        
 
-                        
-                            <a rel="next" href="6.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                                <i class="fa fa-angle-right"></i>
-                            </a>
                         
 
                         <div style="clear: both"></div>
@@ -218,15 +183,7 @@ pub type Result&lt;T&gt; = std::result::Result&lt;T, VMError&gt;;
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
                 
-                    <a rel="prev" href="4.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
-                        <i class="fa fa-angle-left"></i>
-                    </a>
-                
 
-                
-                    <a rel="next" href="6.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                        <i class="fa fa-angle-right"></i>
-                    </a>
                 
             </nav>
 
