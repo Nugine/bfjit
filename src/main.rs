@@ -1,5 +1,3 @@
-#![feature(proc_macro_hygiene)]
-
 mod bfir;
 mod bfjit;
 mod error;

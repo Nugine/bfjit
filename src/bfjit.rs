@@ -3,6 +3,7 @@ use crate::error::{Result, RuntimeError, VMError};
 
 use std::io::{Read, Write};
 use std::path::Path;
+use std::ptr;
 
 use dynasm::dynasm;
 use dynasmrt::{DynasmApi, DynasmLabelApi};
@@ -26,20 +27,22 @@ fn vm_error(re: RuntimeError) -> *mut VMError {
 impl<'io> BfVM<'io> {
     unsafe extern "sysv64" fn getbyte(this: *mut Self, ptr: *mut u8) -> *mut VMError {
         let mut buf = [0_u8];
-        match (&mut *this).input.read(&mut buf) {
+        let this = &mut *this;
+        match this.input.read(&mut buf) {
             Ok(0) => {}
             Ok(1) => *ptr = buf[0],
             Err(e) => return vm_error(RuntimeError::IO(e)),
             _ => unreachable!(),
         }
-        std::ptr::null_mut()
+        ptr::null_mut()
     }
 
     unsafe extern "sysv64" fn putbyte(this: *mut Self, ptr: *const u8) -> *mut VMError {
         let buf = std::slice::from_ref(&*ptr);
-        match (&mut *this).output.write_all(buf) {
-            Ok(()) => std::ptr::null_mut(),
-            Err(e) => return vm_error(RuntimeError::IO(e)),
+        let this = &mut *this;
+        match this.output.write_all(buf) {
+            Ok(()) => ptr::null_mut(),
+            Err(e) => vm_error(RuntimeError::IO(e)),
         }
     }
 
@@ -69,9 +72,9 @@ impl<'io> BfVM<'io> {
         Ok(Self {
             code,
             start,
+            memory,
             input,
             output,
-            memory,
         })
     }
 
@@ -99,6 +102,7 @@ impl<'io> BfVM<'io> {
 }
 
 impl<'io> BfVM<'io> {
+    #[allow(clippy::fn_to_numeric_cast)]
     fn compile(code: &[BfIR]) -> Result<(dynasmrt::ExecutableBuffer, dynasmrt::AssemblyOffset)> {
         let mut ops = dynasmrt::x64::Assembler::new()?;
         let start = ops.offset();
@@ -111,7 +115,7 @@ impl<'io> BfVM<'io> {
         // ptr:          rcx r15
 
         dynasm!(ops
-            ; push rax  
+            ; push rax
             ; mov r12, rdi   // save this
             ; mov r13, rsi   // save memory_start
             ; mov r14, rdx   // save memory_end

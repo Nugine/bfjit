@@ -1,4 +1,4 @@
-use std::fmt::{self, Display};
+use std::fmt;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BfIR {
@@ -27,7 +27,7 @@ pub struct CompileError {
     kind: CompileErrorKind,
 }
 
-impl Display for CompileError {
+impl fmt::Display for CompileError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{} at line {}:{}", self.kind, self.line, self.col)
     }
@@ -63,7 +63,7 @@ pub fn compile(src: &str) -> Result<Vec<BfIR>, CompileError> {
             }
             ']' => {
                 let right = code.len() as u32;
-                let (left, _, _) = stk.pop().ok_or_else(|| CompileError {
+                let (left, _, _) = stk.pop().ok_or(CompileError {
                     line,
                     col,
                     kind: CompileErrorKind::UnexpectedRightBracket,

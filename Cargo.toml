@@ -1,13 +1,13 @@
 [package]
 name = "bfjit"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Nugine <nugine@foxmail.com>"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-thiserror = "1.0.9"
-dynasm = "0.5.2"
-dynasmrt = "0.5.2"
-structopt = "0.3.7"
+thiserror = "1.0.24"
+dynasm = "1.1.0"
+dynasmrt = "1.1.0"
+structopt = "0.3.21"
