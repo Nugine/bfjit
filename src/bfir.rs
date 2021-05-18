@@ -8,8 +8,8 @@ pub enum BfIR {
     SubPtr(u32), // <
     GetByte,     // ,
     PutByte,     // .
-    Jz(u32),     // [
-    Jnz(u32),    // ]
+    Jz,          // [
+    Jnz,         // ]
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -59,18 +59,16 @@ pub fn compile(src: &str) -> Result<Vec<BfIR>, CompileError> {
             '[' => {
                 let pos = code.len() as u32;
                 stk.push((pos, line, col));
-                code.push(BfIR::Jz(u32::max_value()))
+                code.push(BfIR::Jz)
             }
             ']' => {
-                let right = code.len() as u32;
-                let (left, _, _) = stk.pop().ok_or(CompileError {
+                stk.pop().ok_or(CompileError {
                     line,
                     col,
                     kind: CompileErrorKind::UnexpectedRightBracket,
                 })?;
 
-                code[left as usize] = BfIR::Jz(right);
-                code.push(BfIR::Jnz(left))
+                code.push(BfIR::Jnz)
             }
             _ => {}
         }
@@ -124,8 +122,8 @@ pub fn optimize(code: &mut Vec<BfIR>) {
             SubVal(mut x) => _fold_ir!(SubVal, x),
             GetByte => _normal_ir!(),
             PutByte => _normal_ir!(),
-            Jz(_) => _normal_ir!(),
-            Jnz(_) => _normal_ir!(),
+            Jz => _normal_ir!(),
+            Jnz => _normal_ir!(),
         }
     }
 
@@ -133,17 +131,16 @@ pub fn optimize(code: &mut Vec<BfIR>) {
     code.shrink_to_fit();
 }
 
-#[cfg(test)]
 #[test]
 fn test_compile() {
     assert_eq!(
         compile("+[,.]").unwrap(),
         vec![
             BfIR::AddVal(1),
-            BfIR::Jz(4),
+            BfIR::Jz,
             BfIR::GetByte,
             BfIR::PutByte,
-            BfIR::Jnz(1),
+            BfIR::Jnz,
         ]
     );
 
@@ -159,5 +156,5 @@ fn test_compile() {
 
     let mut code = compile("[+++++]").unwrap();
     optimize(&mut code);
-    assert_eq!(code, vec![BfIR::Jz(6), BfIR::AddVal(5), BfIR::Jnz(0)]);
+    assert_eq!(code, vec![BfIR::Jz, BfIR::AddVal(5), BfIR::Jnz]);
 }

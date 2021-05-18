@@ -163,7 +163,7 @@ impl<'io> BfVM<'io> {
                     ; jnz  ->io_error       // jmp if rax != 0
                     ; mov  rcx, r15         // recover ptr
                 ),
-                Jz(_) => {
+                Jz => {
                     let left = ops.new_dynamic_label();
                     let right = ops.new_dynamic_label();
                     loops.push((left, right));
@@ -174,7 +174,7 @@ impl<'io> BfVM<'io> {
                         ; => left
                     )
                 }
-                Jnz(_) => {
+                Jnz => {
                     let (left, right) = loops.pop().unwrap();
                     dynasm!(ops
                         ; cmp BYTE [rcx], 0
