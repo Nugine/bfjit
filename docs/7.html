@@ -136,13 +136,15 @@
                         </a>
                         
                         
+                        
+
                     </div>
                 </div>
 
                 
                 <div id="search-wrapper" class="hidden">
                     <form id="searchbar-outer" class="searchbar-outer">
-                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
                     </form>
                     <div id="searchresults-outer" class="searchresults-outer hidden">
                         <div id="searchresults-header" class="searchresults-header"></div>
@@ -243,7 +245,7 @@
                 ),
 </code></pre>
 <p>跳转指令。利用 dynasm 提供的 api， 创建两个动态标签，分别生成跳转汇编。由于编译到 IR 时已经验证过跳转指令的对应关系，这里的栈可以直接弹出。</p>
-<pre><code class="language-rust noplaypen">                Jz(_) =&gt; {
+<pre><code class="language-rust noplaypen">                Jz =&gt; {
                     let left = ops.new_dynamic_label();
                     let right = ops.new_dynamic_label();
                     loops.push((left, right));
@@ -254,7 +256,7 @@
                         ; =&gt; left
                     )
                 }
-                Jnz(_) =&gt; {
+                Jnz =&gt; {
                     let (left, right) = loops.pop().unwrap();
                     dynasm!(ops
                         ; cmp BYTE [rcx], 0

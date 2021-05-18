@@ -136,13 +136,15 @@
                         </a>
                         
                         
+                        
+
                     </div>
                 </div>
 
                 
                 <div id="search-wrapper" class="hidden">
                     <form id="searchbar-outer" class="searchbar-outer">
-                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
                     </form>
                     <div id="searchresults-outer" class="searchresults-outer hidden">
                         <div id="searchresults-header" class="searchresults-header"></div>
@@ -194,8 +196,8 @@ pub enum BfIR {
     SubPtr(u32), // &lt;
     GetByte,     // ,
     PutByte,     // .
-    Jz(u32),     // [
-    Jnz(u32),    // ]
+    Jz,          // [
+    Jnz,         // ]
 }
 </code></pre>
 <h2 id="错误处理"><a class="header" href="#错误处理">错误处理</a></h2>
@@ -270,24 +272,22 @@ impl fmt::Display for CompileError {
 ',' =&gt; code.push(BfIR::GetByte),
 '.' =&gt; code.push(BfIR::PutByte),
 </code></pre>
-<p>处理左括号，将左括号位置入栈，由于目前还不知道对应的右括号位置，先用一个无穷值占位。</p>
+<p>处理左括号，将左括号位置入栈。</p>
 <pre><code class="language-rust noplaypen">'[' =&gt; {
     let pos = code.len() as u32;
     stk.push((pos, line, col));
-    code.push(BfIR::Jz(u32::max_value()))
+    code.push(BfIR::Jz)
 }
 </code></pre>
-<p>处理右括号，从栈中弹出左括号位置，如果栈为空，说明没有匹配的左括号，生成一个编译错误并返回。将左括号位置的IR修改成正确的跳转指令，右括号对应指令一并完成。</p>
+<p>处理右括号，从栈中弹出左括号位置，如果栈为空，说明没有匹配的左括号，生成一个编译错误并返回。如果有匹配的左括号，则正常生成 IR。</p>
 <pre><code class="language-rust noplaypen">']' =&gt; {
-    let right = code.len() as u32;
-    let (left, _, _) = stk.pop().ok_or_else(|| CompileError {
+    stk.pop().ok_or(CompileError {
         line,
         col,
         kind: CompileErrorKind::UnexpectedRightBracket,
     })?;
 
-    code[left as usize] = BfIR::Jz(right);
-    code.push(BfIR::Jnz(left))
+    code.push(BfIR::Jnz)
 }
 </code></pre>
 <p>忽略其他字符</p>
@@ -328,18 +328,16 @@ Ok(code)
             '[' =&gt; {
                 let pos = code.len() as u32;
                 stk.push((pos, line, col));
-                code.push(BfIR::Jz(u32::max_value()))
+                code.push(BfIR::Jz)
             }
             ']' =&gt; {
-                let right = code.len() as u32;
-                let (left, _, _) = stk.pop().ok_or(CompileError {
+                stk.pop().ok_or(CompileError {
                     line,
                     col,
                     kind: CompileErrorKind::UnexpectedRightBracket,
                 })?;
 
-                code[left as usize] = BfIR::Jz(right);
-                code.push(BfIR::Jnz(left))
+                code.push(BfIR::Jnz)
             }
             _ =&gt; {}
         }
@@ -358,9 +356,7 @@ Ok(code)
 <p>brainfuck 代码中经常有连续的算术加减和指针移动，这些操作完全可以折叠起来。</p>
 <p>优化函数直接操作 IR 序列，用一次遍历完成折叠，原地操作。时间复杂度 O(n)，空间复杂度 O(1)。</p>
 <p>这里定义两个宏来避免复制粘贴大量同样的代码。</p>
-<pre><code class="language-rust noplaypen">pub fn optimize(code: &amp;mut Vec&lt;BfIR&gt;) {
-    let len = code.len();
-    let mut i = 0;
+<pre><code class="language-rust noplaypen">    let mut i = 0;
     let mut pc = 0;
 
     macro_rules! _fold_ir {
@@ -397,29 +393,27 @@ Ok(code)
             SubVal(mut x) =&gt; _fold_ir!(SubVal, x),
             GetByte =&gt; _normal_ir!(),
             PutByte =&gt; _normal_ir!(),
-            Jz(_) =&gt; _normal_ir!(),
-            Jnz(_) =&gt; _normal_ir!(),
+            Jz =&gt; _normal_ir!(),
+            Jnz =&gt; _normal_ir!(),
         }
     }
 
     code.truncate(pc);
     code.shrink_to_fit();
 }
-
 </code></pre>
 <h2 id="简单测试"><a class="header" href="#简单测试">简单测试</a></h2>
 <p>Rust 内置一套单元测试框架，在模块内随手写个函数，标上 <code>#[test]</code>，然后运行命令 <code>cargo test</code>。cargo 会收集所有测试，逐个运行，并报告结果。</p>
-<pre><code class="language-rust noplaypen">#[cfg(test)]
-#[test]
+<pre><code class="language-rust noplaypen">#[test]
 fn test_compile() {
     assert_eq!(
         compile(&quot;+[,.]&quot;).unwrap(),
         vec![
             BfIR::AddVal(1),
-            BfIR::Jz(4),
+            BfIR::Jz,
             BfIR::GetByte,
             BfIR::PutByte,
-            BfIR::Jnz(1),
+            BfIR::Jnz,
         ]
     );
 
@@ -435,7 +429,7 @@ fn test_compile() {
 
     let mut code = compile(&quot;[+++++]&quot;).unwrap();
     optimize(&amp;mut code);
-    assert_eq!(code, vec![BfIR::Jz(6), BfIR::AddVal(5), BfIR::Jnz(0)]);
+    assert_eq!(code, vec![BfIR::Jz, BfIR::AddVal(5), BfIR::Jnz]);
 }
 </code></pre>
 

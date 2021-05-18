@@ -138,13 +138,15 @@
                         </a>
                         
                         
+                        
+
                     </div>
                 </div>
 
                 
                 <div id="search-wrapper" class="hidden">
                     <form id="searchbar-outer" class="searchbar-outer">
-                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
                     </form>
                     <div id="searchresults-outer" class="searchresults-outer hidden">
                         <div id="searchresults-header" class="searchresults-header"></div>
@@ -169,7 +171,7 @@
 <p>当我们谈到 JIT 时，通常会想到 V8、JVM 之类的庞然大物，然后望而生畏，觉得 JIT 是一种极其高深复杂的技术。</p>
 <p>但 JIT 也可以变得非常简单，我们不需要做完善的优化和分析，只要输入源码，输出机器指令，再执行，这和普通的文本处理程序没什么区别。</p>
 <p>在本教程中，我们将用 Rust 语言实现一个简单的 Brainfuck JIT 虚拟机，逐步理解 JIT 技术。</p>
-<h1 id="1-背景知识"><a class="header" href="#1-背景知识">1. 背景知识</a></h1>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="1-背景知识"><a class="header" href="#1-背景知识">1. 背景知识</a></h1>
 <h2 id="brainfuck-简介"><a class="header" href="#brainfuck-简介">Brainfuck 简介</a></h2>
 <p><a href="https://en.wikipedia.org/wiki/Brainfuck">https://en.wikipedia.org/wiki/Brainfuck</a></p>
 <p>Brainfuck 仅包含八个指令，却是图灵完备的，理论上它可以做到任何用图灵机能做到的事情。</p>
@@ -206,7 +208,7 @@ char *ptr=array;
 <p>Rust 并不是一个能立即上手的语言，如果您是一位 Rust 新手，最好先全面了解 Rust 语言特性。</p>
 <p>Rust 官网入门教程 <a href="https://www.rust-lang.org/zh-CN/learn">https://www.rust-lang.org/zh-CN/learn</a></p>
 <p>中文书《Rust编程之道》 <a href="https://book.douban.com/subject/30418895/">https://book.douban.com/subject/30418895/</a></p>
-<h1 id="2-启动项目"><a class="header" href="#2-启动项目">2. 启动项目</a></h1>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="2-启动项目"><a class="header" href="#2-启动项目">2. 启动项目</a></h1>
 <p>初始化项目</p>
 <pre><code class="language-bash">cargo new bfjit
 cd bfjit
@@ -218,7 +220,7 @@ Running `target/debug/bfjit`
 Hello, world!
 </code></pre>
 <p>一切就绪。</p>
-<h1 id="3-中间表示"><a class="header" href="#3-中间表示">3. 中间表示</a></h1>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="3-中间表示"><a class="header" href="#3-中间表示">3. 中间表示</a></h1>
 <p>为了方便后期处理，我们先将 Brainfuck 代码转换为一种中间表示 (IR).</p>
 <p>在 src 目录下添加文件 bfir.rs</p>
 <p>此时目录结构</p>
@@ -249,8 +251,8 @@ pub enum BfIR {
     SubPtr(u32), // &lt;
     GetByte,     // ,
     PutByte,     // .
-    Jz(u32),     // [
-    Jnz(u32),    // ]
+    Jz,          // [
+    Jnz,         // ]
 }
 </code></pre>
 <h2 id="错误处理"><a class="header" href="#错误处理">错误处理</a></h2>
@@ -325,24 +327,22 @@ impl fmt::Display for CompileError {
 ',' =&gt; code.push(BfIR::GetByte),
 '.' =&gt; code.push(BfIR::PutByte),
 </code></pre>
-<p>处理左括号，将左括号位置入栈，由于目前还不知道对应的右括号位置，先用一个无穷值占位。</p>
+<p>处理左括号，将左括号位置入栈。</p>
 <pre><code class="language-rust noplaypen">'[' =&gt; {
     let pos = code.len() as u32;
     stk.push((pos, line, col));
-    code.push(BfIR::Jz(u32::max_value()))
+    code.push(BfIR::Jz)
 }
 </code></pre>
-<p>处理右括号，从栈中弹出左括号位置，如果栈为空，说明没有匹配的左括号，生成一个编译错误并返回。将左括号位置的IR修改成正确的跳转指令，右括号对应指令一并完成。</p>
+<p>处理右括号，从栈中弹出左括号位置，如果栈为空，说明没有匹配的左括号，生成一个编译错误并返回。如果有匹配的左括号，则正常生成 IR。</p>
 <pre><code class="language-rust noplaypen">']' =&gt; {
-    let right = code.len() as u32;
-    let (left, _, _) = stk.pop().ok_or_else(|| CompileError {
+    stk.pop().ok_or(CompileError {
         line,
         col,
         kind: CompileErrorKind::UnexpectedRightBracket,
     })?;
 
-    code[left as usize] = BfIR::Jz(right);
-    code.push(BfIR::Jnz(left))
+    code.push(BfIR::Jnz)
 }
 </code></pre>
 <p>忽略其他字符</p>
@@ -383,18 +383,16 @@ Ok(code)
             '[' =&gt; {
                 let pos = code.len() as u32;
                 stk.push((pos, line, col));
-                code.push(BfIR::Jz(u32::max_value()))
+                code.push(BfIR::Jz)
             }
             ']' =&gt; {
-                let right = code.len() as u32;
-                let (left, _, _) = stk.pop().ok_or(CompileError {
+                stk.pop().ok_or(CompileError {
                     line,
                     col,
                     kind: CompileErrorKind::UnexpectedRightBracket,
                 })?;
 
-                code[left as usize] = BfIR::Jz(right);
-                code.push(BfIR::Jnz(left))
+                code.push(BfIR::Jnz)
             }
             _ =&gt; {}
         }
@@ -413,9 +411,7 @@ Ok(code)
 <p>brainfuck 代码中经常有连续的算术加减和指针移动，这些操作完全可以折叠起来。</p>
 <p>优化函数直接操作 IR 序列，用一次遍历完成折叠，原地操作。时间复杂度 O(n)，空间复杂度 O(1)。</p>
 <p>这里定义两个宏来避免复制粘贴大量同样的代码。</p>
-<pre><code class="language-rust noplaypen">pub fn optimize(code: &amp;mut Vec&lt;BfIR&gt;) {
-    let len = code.len();
-    let mut i = 0;
+<pre><code class="language-rust noplaypen">    let mut i = 0;
     let mut pc = 0;
 
     macro_rules! _fold_ir {
@@ -452,29 +448,27 @@ Ok(code)
             SubVal(mut x) =&gt; _fold_ir!(SubVal, x),
             GetByte =&gt; _normal_ir!(),
             PutByte =&gt; _normal_ir!(),
-            Jz(_) =&gt; _normal_ir!(),
-            Jnz(_) =&gt; _normal_ir!(),
+            Jz =&gt; _normal_ir!(),
+            Jnz =&gt; _normal_ir!(),
         }
     }
 
     code.truncate(pc);
     code.shrink_to_fit();
 }
-
 </code></pre>
 <h2 id="简单测试"><a class="header" href="#简单测试">简单测试</a></h2>
 <p>Rust 内置一套单元测试框架，在模块内随手写个函数，标上 <code>#[test]</code>，然后运行命令 <code>cargo test</code>。cargo 会收集所有测试，逐个运行，并报告结果。</p>
-<pre><code class="language-rust noplaypen">#[cfg(test)]
-#[test]
+<pre><code class="language-rust noplaypen">#[test]
 fn test_compile() {
     assert_eq!(
         compile(&quot;+[,.]&quot;).unwrap(),
         vec![
             BfIR::AddVal(1),
-            BfIR::Jz(4),
+            BfIR::Jz,
             BfIR::GetByte,
             BfIR::PutByte,
-            BfIR::Jnz(1),
+            BfIR::Jnz,
         ]
     );
 
@@ -490,10 +484,10 @@ fn test_compile() {
 
     let mut code = compile(&quot;[+++++]&quot;).unwrap();
     optimize(&amp;mut code);
-    assert_eq!(code, vec![BfIR::Jz(6), BfIR::AddVal(5), BfIR::Jnz(0)]);
+    assert_eq!(code, vec![BfIR::Jz, BfIR::AddVal(5), BfIR::Jnz]);
 }
 </code></pre>
-<h1 id="4-hello-jit"><a class="header" href="#4-hello-jit">4. Hello, JIT</a></h1>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="4-hello-jit"><a class="header" href="#4-hello-jit">4. Hello, JIT</a></h1>
 <p>通常来说，Just In Time (JIT) 编译器 是指在某段高阶代码即将运行时将其编译到机器码再执行的程序。下文中，我们把这样的程序叫做 &quot;JIT&quot;。</p>
 <p>一个最简单的 JIT 工作方式是这样的：</p>
 <ol>
@@ -661,7 +655,7 @@ fn main() {
 }
 <span class="boring">}
 </span></code></pre></pre>
-<h1 id="5-来点错误"><a class="header" href="#5-来点错误">5. 来点错误</a></h1>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="5-来点错误"><a class="header" href="#5-来点错误">5. 来点错误</a></h1>
 <p>添加一个错误模块</p>
 <p>src/main.rs</p>
 <pre><code class="language-rust noplaypen">mod error;
@@ -692,7 +686,7 @@ pub type Result&lt;T&gt; = std::result::Result&lt;T, VMError&gt;;
 </code></pre>
 <p>虚拟机运行时可能出现两种错误，IO 错误和指针溢出。</p>
 <p>虚拟机首先需要读取源代码，可能出现IO错误，然后将源代码编译为 IR，可能发生编译错误，最后运行程序，可能有运行时错误。</p>
-<h1 id="6-实现虚拟机"><a class="header" href="#6-实现虚拟机">6. 实现虚拟机</a></h1>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="6-实现虚拟机"><a class="header" href="#6-实现虚拟机">6. 实现虚拟机</a></h1>
 <p>添加模块 src/bfjit.rs</p>
 <p>导入必要的类型</p>
 <pre><code class="language-rust noplaypen">use crate::bfir::{self, BfIR};
@@ -811,7 +805,7 @@ impl&lt;'io&gt; BfVM&lt;'io&gt; {
         }
     }
 </code></pre>
-<h1 id="7-生成机器码"><a class="header" href="#7-生成机器码">7. 生成机器码</a></h1>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="7-生成机器码"><a class="header" href="#7-生成机器码">7. 生成机器码</a></h1>
 <p>完成上一节留空的 compile 方法。</p>
 <p>首先初始化汇编器。整个 brainfuck 程序编译为一个大函数，函数起始地址就是最开始的偏移。</p>
 <p>loops 作为栈，用来存放动态标签，指引跳转。</p>
@@ -891,7 +885,7 @@ impl&lt;'io&gt; BfVM&lt;'io&gt; {
                 ),
 </code></pre>
 <p>跳转指令。利用 dynasm 提供的 api， 创建两个动态标签，分别生成跳转汇编。由于编译到 IR 时已经验证过跳转指令的对应关系，这里的栈可以直接弹出。</p>
-<pre><code class="language-rust noplaypen">                Jz(_) =&gt; {
+<pre><code class="language-rust noplaypen">                Jz =&gt; {
                     let left = ops.new_dynamic_label();
                     let right = ops.new_dynamic_label();
                     loops.push((left, right));
@@ -902,7 +896,7 @@ impl&lt;'io&gt; BfVM&lt;'io&gt; {
                         ; =&gt; left
                     )
                 }
-                Jnz(_) =&gt; {
+                Jnz =&gt; {
                     let (left, right) = loops.pop().unwrap();
                     dynasm!(ops
                         ; cmp BYTE [rcx], 0
@@ -935,7 +929,7 @@ impl&lt;'io&gt; BfVM&lt;'io&gt; {
         Ok((code, start))
     }
 </code></pre>
-<h1 id="命令行界面"><a class="header" href="#命令行界面">命令行界面</a></h1>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="命令行界面"><a class="header" href="#命令行界面">命令行界面</a></h1>
 <p>虚拟机已经完成，剩下的就是把它包装成命令行界面 (CLI) 了。</p>
 <p>我们使用 structopt 库，用结构体定义命令行参数解析。</p>
 <p><a href="https://github.com/TeXitoi/structopt">https://github.com/TeXitoi/structopt</a></p>
@@ -1020,7 +1014,7 @@ sys     0m0.010s
 <p>注意：多层自解释器的效率会严重下降，短时间内无法得出结果。</p>
 <p><a href="https://github.com/cagataycali/awesome-brainfuck">https://github.com/cagataycali/awesome-brainfuck</a></p>
 <p><a href="http://homepages.xnet.co.nz/%7Eclive/eigenratios/cgbfi2.b">http://homepages.xnet.co.nz/~clive/eigenratios/cgbfi2.b</a></p>
-<h1 id="结语"><a class="header" href="#结语">结语</a></h1>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="结语"><a class="header" href="#结语">结语</a></h1>
 <p>本教程基于 dynasm 实现了一个 Brainfuck JIT 虚拟机，主要功能有 Brainfuck 解析编译、简单优化、动态生成机器码，并提供了友好的命令行界面。</p>
 <p>希望本项目对有兴趣深入研究 JIT 技术的人有所帮助。</p>
 <p>欢迎 PR 来进一步改进本项目。</p>
