@@ -4,39 +4,26 @@
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
         <title>Brainfuck JIT 虚拟机教程</title>
-        
         <meta name="robots" content="noindex" />
-        
-        
 
 
         <!-- Custom HTML head -->
         
-
-
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff" />
 
-        
         <link rel="icon" href="favicon.svg">
-        
-        
         <link rel="shortcut icon" href="favicon.png">
-        
         <link rel="stylesheet" href="css/variables.css">
         <link rel="stylesheet" href="css/general.css">
         <link rel="stylesheet" href="css/chrome.css">
-        
         <link rel="stylesheet" href="css/print.css" media="print">
-        
 
         <!-- Fonts -->
         <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
-        
         <link rel="stylesheet" href="fonts/fonts.css">
-        
 
         <!-- Highlight.js Stylesheets -->
         <link rel="stylesheet" href="highlight.css">
@@ -44,9 +31,7 @@
         <link rel="stylesheet" href="ayu-highlight.css">
 
         <!-- Custom theme stylesheets -->
-        
 
-        
     </head>
     <body>
         <!-- Provide site root to javascript -->
@@ -97,7 +82,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="introduction.html">介绍</a></li><li class="chapter-item expanded "><a href="1.html"><strong aria-hidden="true">1.</strong> 背景知识</a></li><li class="chapter-item expanded "><a href="2.html"><strong aria-hidden="true">2.</strong> 启动项目</a></li><li class="chapter-item expanded "><a href="3.html"><strong aria-hidden="true">3.</strong> 中间表示</a></li><li class="chapter-item expanded "><a href="4.html"><strong aria-hidden="true">4.</strong> Hello, JIT</a></li><li class="chapter-item expanded "><a href="5.html"><strong aria-hidden="true">5.</strong> 来点错误</a></li><li class="chapter-item expanded "><a href="6.html"><strong aria-hidden="true">6.</strong> 实现虚拟机</a></li><li class="chapter-item expanded "><a href="7.html"><strong aria-hidden="true">7.</strong> 生成机器码</a></li><li class="chapter-item expanded "><a href="8.html"><strong aria-hidden="true">8.</strong> 命令行界面</a></li><li class="chapter-item expanded affix "><a href="conclusion.html">结语</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="introduction.html">介绍</a></li><li class="chapter-item expanded "><a href="1.html"><strong aria-hidden="true">1.</strong> 1. 背景知识</a></li><li class="chapter-item expanded "><a href="2.html"><strong aria-hidden="true">2.</strong> 2. 启动项目</a></li><li class="chapter-item expanded "><a href="3.html"><strong aria-hidden="true">3.</strong> 3. 中间表示</a></li><li class="chapter-item expanded "><a href="4.html"><strong aria-hidden="true">4.</strong> 4. Hello, JIT</a></li><li class="chapter-item expanded "><a href="5.html"><strong aria-hidden="true">5.</strong> 5. 来点错误</a></li><li class="chapter-item expanded "><a href="6.html"><strong aria-hidden="true">6.</strong> 6. 实现虚拟机</a></li><li class="chapter-item expanded "><a href="7.html"><strong aria-hidden="true">7.</strong> 7. 生成机器码</a></li><li class="chapter-item expanded "><a href="8.html"><strong aria-hidden="true">8.</strong> 8. 命令行界面</a></li><li class="chapter-item expanded affix "><a href="conclusion.html">结语</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -105,8 +90,7 @@
         <div id="page-wrapper" class="page-wrapper">
 
             <div class="page">
-                
-                <div id="menu-bar-hover-placeholder"></div>
+                                <div id="menu-bar-hover-placeholder"></div>
                 <div id="menu-bar" class="menu-bar sticky bordered">
                     <div class="left-buttons">
                         <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
@@ -122,28 +106,21 @@
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
                         </ul>
-                        
                         <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
                             <i class="fa fa-search"></i>
                         </button>
-                        
                     </div>
 
                     <h1 class="menu-title">Brainfuck JIT 虚拟机教程</h1>
 
                     <div class="right-buttons">
-                        
                         <a href="print.html" title="Print this book" aria-label="Print this book">
                             <i id="print-button" class="fa fa-print"></i>
                         </a>
-                        
-                        
-                        
 
                     </div>
                 </div>
 
-                
                 <div id="search-wrapper" class="hidden">
                     <form id="searchbar-outer" class="searchbar-outer">
                         <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
@@ -154,7 +131,6 @@
                         </ul>
                     </div>
                 </div>
-                
 
                 <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
                 <script type="text/javascript">
@@ -171,7 +147,7 @@
 <p>当我们谈到 JIT 时，通常会想到 V8、JVM 之类的庞然大物，然后望而生畏，觉得 JIT 是一种极其高深复杂的技术。</p>
 <p>但 JIT 也可以变得非常简单，我们不需要做完善的优化和分析，只要输入源码，输出机器指令，再执行，这和普通的文本处理程序没什么区别。</p>
 <p>在本教程中，我们将用 Rust 语言实现一个简单的 Brainfuck JIT 虚拟机，逐步理解 JIT 技术。</p>
-<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="1-背景知识"><a class="header" href="#1-背景知识">1. 背景知识</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="1-背景知识"><a class="header" href="#1-背景知识">1. 背景知识</a></h1>
 <h2 id="brainfuck-简介"><a class="header" href="#brainfuck-简介">Brainfuck 简介</a></h2>
 <p><a href="https://en.wikipedia.org/wiki/Brainfuck">https://en.wikipedia.org/wiki/Brainfuck</a></p>
 <p>Brainfuck 仅包含八个指令，却是图灵完备的，理论上它可以做到任何用图灵机能做到的事情。</p>
@@ -208,7 +184,7 @@ char *ptr=array;
 <p>Rust 并不是一个能立即上手的语言，如果您是一位 Rust 新手，最好先全面了解 Rust 语言特性。</p>
 <p>Rust 官网入门教程 <a href="https://www.rust-lang.org/zh-CN/learn">https://www.rust-lang.org/zh-CN/learn</a></p>
 <p>中文书《Rust编程之道》 <a href="https://book.douban.com/subject/30418895/">https://book.douban.com/subject/30418895/</a></p>
-<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="2-启动项目"><a class="header" href="#2-启动项目">2. 启动项目</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="2-启动项目"><a class="header" href="#2-启动项目">2. 启动项目</a></h1>
 <p>初始化项目</p>
 <pre><code class="language-bash">cargo new bfjit
 cd bfjit
@@ -220,7 +196,7 @@ Running `target/debug/bfjit`
 Hello, world!
 </code></pre>
 <p>一切就绪。</p>
-<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="3-中间表示"><a class="header" href="#3-中间表示">3. 中间表示</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="3-中间表示"><a class="header" href="#3-中间表示">3. 中间表示</a></h1>
 <p>为了方便后期处理，我们先将 Brainfuck 代码转换为一种中间表示 (IR).</p>
 <p>在 src 目录下添加文件 bfir.rs</p>
 <p>此时目录结构</p>
@@ -232,7 +208,7 @@ Hello, world!
    └── main.rs
 </code></pre>
 <p>main.rs</p>
-<pre><code class="language-rust noplaypen">mod bfir;
+<pre><code class="language-rust  noplaypen">mod bfir;
 
 fn main() {
     println!(&quot;Hello, world!&quot;);
@@ -243,7 +219,7 @@ fn main() {
 <p>AddVal, SubVal 表示将当前单元加减某一数值。</p>
 <p>AddPtr, SubPtr 表示将数据指针加减某一数值。</p>
 <p>Jz，Jnz 表示跳转指令，带有跳转地址。</p>
-<pre><code class="language-rust noplaypen">#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+<pre><code class="language-rust  noplaypen">#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BfIR {
     AddVal(u8),  // +
     SubVal(u8),  // -
@@ -265,7 +241,7 @@ pub enum BfIR {
 <pre><code class="language-bash">cargo add thiserror
 </code></pre>
 <p>错误定义</p>
-<pre><code class="language-rust noplaypen">#[derive(Debug, thiserror::Error)]
+<pre><code class="language-rust  noplaypen">#[derive(Debug, thiserror::Error)]
 pub enum CompileErrorKind {
     #[error(&quot;Unclosed left bracket&quot;)]
     UnclosedLeftBracket,
@@ -281,7 +257,7 @@ pub struct CompileError {
 }
 </code></pre>
 <p>为 CompileError 实现 Display 和 Error，Display 用于对人友好的信息，Error 表明它是一个错误类型。</p>
-<pre><code class="language-rust noplaypen">#[derive(Debug)]
+<pre><code class="language-rust  noplaypen">#[derive(Debug)]
 pub struct CompileError {
     line: u32,
     col: u32,
@@ -295,7 +271,7 @@ impl fmt::Display for CompileError {
 }
 </code></pre>
 <h2 id="编译为-ir"><a class="header" href="#编译为-ir">编译为 IR</a></h2>
-<pre><code class="language-rust noplaypen">pub fn compile(src: &amp;str) -&gt; Result&lt;Vec&lt;BfIR&gt;, CompileError&gt; {
+<pre><code class="language-rust  noplaypen">pub fn compile(src: &amp;str) -&gt; Result&lt;Vec&lt;BfIR&gt;, CompileError&gt; {
     let mut code: Vec&lt;BfIR&gt; = vec![];
 
     let mut stk: Vec&lt;(u32, u32, u32)&gt; = vec![];
@@ -306,7 +282,7 @@ impl fmt::Display for CompileError {
 <p>compile 函数接收一个字符串，返回 IR 序列。</p>
 <p>code 存储已解析的 IR，stk 作为栈，存储左括号的IR位置、源代码行位置、源代码列位置，line 和 col 分别记录行号和列号。</p>
 <p>主循环结构</p>
-<pre><code class="language-rust noplaypen">for ch in src.chars() {
+<pre><code class="language-rust  noplaypen">for ch in src.chars() {
     col += 1;
     match ch {
         ...
@@ -314,13 +290,13 @@ impl fmt::Display for CompileError {
 }
 </code></pre>
 <p>处理换行</p>
-<pre><code class="language-rust noplaypen">'\n' =&gt; {
+<pre><code class="language-rust  noplaypen">'\n' =&gt; {
     line += 1;
     col = 0;
 }
 </code></pre>
 <p>处理普通指令</p>
-<pre><code class="language-rust noplaypen">'+' =&gt; code.push(BfIR::AddVal(1)),
+<pre><code class="language-rust  noplaypen">'+' =&gt; code.push(BfIR::AddVal(1)),
 '-' =&gt; code.push(BfIR::SubVal(1)),
 '&gt;' =&gt; code.push(BfIR::AddPtr(1)),
 '&lt;' =&gt; code.push(BfIR::SubPtr(1)),
@@ -328,14 +304,14 @@ impl fmt::Display for CompileError {
 '.' =&gt; code.push(BfIR::PutByte),
 </code></pre>
 <p>处理左括号，将左括号位置入栈。</p>
-<pre><code class="language-rust noplaypen">'[' =&gt; {
+<pre><code class="language-rust  noplaypen">'[' =&gt; {
     let pos = code.len() as u32;
     stk.push((pos, line, col));
     code.push(BfIR::Jz)
 }
 </code></pre>
 <p>处理右括号，从栈中弹出左括号位置，如果栈为空，说明没有匹配的左括号，生成一个编译错误并返回。如果有匹配的左括号，则正常生成 IR。</p>
-<pre><code class="language-rust noplaypen">']' =&gt; {
+<pre><code class="language-rust  noplaypen">']' =&gt; {
     stk.pop().ok_or(CompileError {
         line,
         col,
@@ -346,10 +322,10 @@ impl fmt::Display for CompileError {
 }
 </code></pre>
 <p>忽略其他字符</p>
-<pre><code class="language-rust noplaypen">_ =&gt; {}
+<pre><code class="language-rust  noplaypen">_ =&gt; {}
 </code></pre>
 <p>循环结束后，如果栈不为空，说明有左括号没有匹配到右括号，弹出左括号位置，生成编译错误。最后返回生成的IR.</p>
-<pre><code class="language-rust noplaypen">if let Some((_, line, col)) = stk.pop() {
+<pre><code class="language-rust  noplaypen">if let Some((_, line, col)) = stk.pop() {
     return Err(CompileError {
         line,
         col,
@@ -487,7 +463,7 @@ fn test_compile() {
     assert_eq!(code, vec![BfIR::Jz, BfIR::AddVal(5), BfIR::Jnz]);
 }
 </code></pre>
-<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="4-hello-jit"><a class="header" href="#4-hello-jit">4. Hello, JIT</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="4-hello-jit"><a class="header" href="#4-hello-jit">4. Hello, JIT</a></h1>
 <p>通常来说，Just In Time (JIT) 编译器 是指在某段高阶代码即将运行时将其编译到机器码再执行的程序。下文中，我们把这样的程序叫做 &quot;JIT&quot;。</p>
 <p>一个最简单的 JIT 工作方式是这样的：</p>
 <ol>
@@ -540,7 +516,7 @@ int main(int argc, char *argv[]) {
 <pre><code class="language-bash">cargo add dynasm dynasmrt
 </code></pre>
 <p>修改 main.rs，导入 dynasm.</p>
-<pre><code class="language-rust noplaypen">mod bfir;
+<pre><code class="language-rust  noplaypen">mod bfir;
 
 use dynasm::dynasm;
 use dynasmrt::{DynasmApi, DynasmLabelApi};
@@ -549,13 +525,13 @@ use std::io::{stdout, Write};
 </code></pre>
 <p>编写 print 函数，使用 &quot;sysv64&quot; ABI。</p>
 <p>x86-64 Linux 系统上默认为 System V ABI. <a href="https://github.com/hjl-tools/x86-psABI/wiki/X86-psABI">相关文档</a></p>
-<pre><code class="language-rust noplaypen">unsafe extern &quot;sysv64&quot; fn print(buf: *const u8, len: u64) -&gt; u8 {
+<pre><code class="language-rust  noplaypen">unsafe extern &quot;sysv64&quot; fn print(buf: *const u8, len: u64) -&gt; u8 {
     let buf = std::slice::from_raw_parts(buf, len as usize);
     stdout().write_all(buf).is_err() as u8
 }
 </code></pre>
 <p>首先初始化汇编器，指定架构为 x64，全局标签 hello 指向字符串。</p>
-<pre><code class="language-rust noplaypen">fn main() {
+<pre><code class="language-rust  noplaypen">fn main() {
     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
     let string = b&quot;Hello, JIT!\n&quot;;
 
@@ -567,7 +543,7 @@ use std::io::{stdout, Write};
 </code></pre>
 <p>dynasm 使用 nasm 的方言，左操作数为目标，右操作数为源。</p>
 <p>sysv64 调用约定规定 rdi, rsi, rdx, rcx 存放前四个整数参数，rax 存放返回值。</p>
-<pre><code class="language-rust noplaypen">    let hello = ops.offset();
+<pre><code class="language-rust  noplaypen">    let hello = ops.offset();
     dynasm!(ops
         ; lea rdi, [-&gt;hello]                // 将 hello 字符串地址放入 rdi
         ; mov rsi, QWORD string.len() as _  // 将 字符串长度放入 rsi
@@ -577,7 +553,7 @@ use std::io::{stdout, Write};
     );
 </code></pre>
 <p>完成汇编，取得可执行缓冲区。根据偏移拿到函数地址，强制转换为函数指针。最后调用机器码，得到结果。</p>
-<pre><code class="language-rust noplaypen">    let buf = ops.finalize().unwrap();
+<pre><code class="language-rust  noplaypen">    let buf = ops.finalize().unwrap();
 
     let hello_fn: unsafe extern &quot;sysv64&quot; fn() -&gt; u8 =
         unsafe { std::mem::transmute(buf.ptr(hello)) };
@@ -594,7 +570,7 @@ use std::io::{stdout, Write};
 Hello, JIT!
 </code></pre>
 <p>完整代码</p>
-<pre><code class="language-rust noplaypen">mod bfir;
+<pre><code class="language-rust  noplaypen">mod bfir;
 
 use dynasm::dynasm;
 use dynasmrt::{DynasmApi, DynasmLabelApi};
@@ -655,13 +631,13 @@ fn main() {
 }
 <span class="boring">}
 </span></code></pre></pre>
-<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="5-来点错误"><a class="header" href="#5-来点错误">5. 来点错误</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="5-来点错误"><a class="header" href="#5-来点错误">5. 来点错误</a></h1>
 <p>添加一个错误模块</p>
 <p>src/main.rs</p>
-<pre><code class="language-rust noplaypen">mod error;
+<pre><code class="language-rust  noplaypen">mod error;
 </code></pre>
 <p>src/error.rs</p>
-<pre><code class="language-rust noplaypen">#[derive(Debug, thiserror::Error)]
+<pre><code class="language-rust  noplaypen">#[derive(Debug, thiserror::Error)]
 pub enum RuntimeError {
     #[error(&quot;IO: {0}&quot;)]
     IO(#[from] std::io::Error),
@@ -686,7 +662,7 @@ pub type Result&lt;T&gt; = std::result::Result&lt;T, VMError&gt;;
 </code></pre>
 <p>虚拟机运行时可能出现两种错误，IO 错误和指针溢出。</p>
 <p>虚拟机首先需要读取源代码，可能出现IO错误，然后将源代码编译为 IR，可能发生编译错误，最后运行程序，可能有运行时错误。</p>
-<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="6-实现虚拟机"><a class="header" href="#6-实现虚拟机">6. 实现虚拟机</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="6-实现虚拟机"><a class="header" href="#6-实现虚拟机">6. 实现虚拟机</a></h1>
 <p>添加模块 src/bfjit.rs</p>
 <p>导入必要的类型</p>
 <pre><code class="language-rust noplaypen">use crate::bfir::{self, BfIR};
@@ -749,7 +725,7 @@ impl&lt;'io&gt; BfVM&lt;'io&gt; {
 </code></pre>
 <p>用输入流、输出流、源文件路径初始化虚拟机，优化选项也由外部提供。</p>
 <p>compile 方法暂时留空。</p>
-<pre><code class="language-rust noplaypen">impl&lt;'io&gt; BfVM&lt;'io&gt; {
+<pre><code class="language-rust  noplaypen">impl&lt;'io&gt; BfVM&lt;'io&gt; {
     fn compile(code: &amp;[BfIR]) -&gt; Result&lt;(dynasmrt::ExecutableBuffer, dynasmrt::AssemblyOffset)&gt; {
         todo!()
     }
@@ -805,7 +781,7 @@ impl&lt;'io&gt; BfVM&lt;'io&gt; {
         }
     }
 </code></pre>
-<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="7-生成机器码"><a class="header" href="#7-生成机器码">7. 生成机器码</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="7-生成机器码"><a class="header" href="#7-生成机器码">7. 生成机器码</a></h1>
 <p>完成上一节留空的 compile 方法。</p>
 <p>首先初始化汇编器。整个 brainfuck 程序编译为一个大函数，函数起始地址就是最开始的偏移。</p>
 <p>loops 作为栈，用来存放动态标签，指引跳转。</p>
@@ -929,11 +905,11 @@ impl&lt;'io&gt; BfVM&lt;'io&gt; {
         Ok((code, start))
     }
 </code></pre>
-<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="命令行界面"><a class="header" href="#命令行界面">命令行界面</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="命令行界面"><a class="header" href="#命令行界面">命令行界面</a></h1>
 <p>虚拟机已经完成，剩下的就是把它包装成命令行界面 (CLI) 了。</p>
-<p>我们使用 structopt 库，用结构体定义命令行参数解析。</p>
-<p><a href="https://github.com/TeXitoi/structopt">https://github.com/TeXitoi/structopt</a></p>
-<pre><code class="language-bash">cargo add structopt
+<p>我们使用 clap 库，用结构体定义命令行参数解析。</p>
+<p><a href="https://github.com/clap-rs/clap">https://github.com/clap-rs/clap</a></p>
+<pre><code class="language-bash">cargo add clap --features derive
 </code></pre>
 <p>这就是 main.rs 的全部代码。</p>
 <pre><code class="language-rust noplaypen">mod bfir;
@@ -945,19 +921,20 @@ use crate::bfjit::BfVM;
 use std::io::{stdin, stdout};
 use std::path::PathBuf;
 
-use structopt::StructOpt;
+use clap::Parser;
 
-#[derive(Debug, StructOpt)]
+#[derive(Debug, clap::Parser)]
+#[clap(version)]
 struct Opt {
-    #[structopt(name = &quot;FILE&quot;)]
+    #[clap(name = &quot;FILE&quot;)]
     file_path: PathBuf,
 
-    #[structopt(short = &quot;o&quot;, long = &quot;optimize&quot;, help = &quot;Optimize code&quot;)]
+    #[clap(short = 'o', long = &quot;optimize&quot;, help = &quot;Optimize code&quot;)]
     optimize: bool,
 }
 
 fn main() {
-    let opt = Opt::from_args();
+    let opt = Opt::parse();
 
     let stdin = stdin();
     let stdout = stdout();
@@ -980,18 +957,18 @@ fn main() {
 <p>把写好的命令行应用安装到系统。</p>
 <pre><code class="language-bash">$ cargo install --path .
 $ bfjit --help
-bfjit 0.1.1
+bfjit 0.1.2
 
 USAGE:
-    bfjit [FLAGS] &lt;FILE&gt;
-
-FLAGS:
-    -h, --help        Prints help information
-    -o, --optimize    Optimize code
-    -V, --version     Prints version information
+    bfjit [OPTIONS] &lt;FILE&gt;
 
 ARGS:
-    &lt;FILE&gt; 
+    &lt;FILE&gt;    
+
+OPTIONS:
+    -h, --help        Print help information
+    -o, --optimize    Optimize code
+    -V, --version     Print version information
 </code></pre>
 <p>从 github 上找一些 brainfuck 程序运行，观察 JIT 与解释器的效率差别。</p>
 <pre><code class="language-bash">$ bfjit bf/hello.bf
@@ -1014,22 +991,20 @@ sys     0m0.010s
 <p>注意：多层自解释器的效率会严重下降，短时间内无法得出结果。</p>
 <p><a href="https://github.com/cagataycali/awesome-brainfuck">https://github.com/cagataycali/awesome-brainfuck</a></p>
 <p><a href="http://homepages.xnet.co.nz/%7Eclive/eigenratios/cgbfi2.b">http://homepages.xnet.co.nz/~clive/eigenratios/cgbfi2.b</a></p>
-<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="结语"><a class="header" href="#结语">结语</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="结语"><a class="header" href="#结语">结语</a></h1>
 <p>本教程基于 dynasm 实现了一个 Brainfuck JIT 虚拟机，主要功能有 Brainfuck 解析编译、简单优化、动态生成机器码，并提供了友好的命令行界面。</p>
 <p>希望本项目对有兴趣深入研究 JIT 技术的人有所帮助。</p>
 <p>欢迎 PR 来进一步改进本项目。</p>
 <p>第三方依赖：</p>
 <p><a href="https://crates.io/crates/dynasm">https://crates.io/crates/dynasm</a></p>
 <p><a href="https://github.com/dtolnay/thiserror">https://github.com/dtolnay/thiserror</a></p>
-<p><a href="https://github.com/TeXitoi/structopt">https://github.com/TeXitoi/structopt</a></p>
+<p><a href="https://github.com/clap-rs/clap">https://github.com/clap-rs/clap</a></p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                        
 
-                        
 
                         <div style="clear: both"></div>
                     </nav>
@@ -1037,49 +1012,34 @@ sys     0m0.010s
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                
 
-                
             </nav>
 
         </div>
 
-        
 
-        
 
-        
 
-        
         <script type="text/javascript">
             window.playground_copyable = true;
         </script>
-        
 
-        
 
-        
         <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
         <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
         <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
-        
 
         <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
         <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
         <script src="book.js" type="text/javascript" charset="utf-8"></script>
 
         <!-- Custom JS scripts -->
-        
 
-        
-        
         <script type="text/javascript">
         window.addEventListener('load', function() {
             window.setTimeout(window.print, 100);
         });
         </script>
-        
-        
 
     </body>
 </html>
