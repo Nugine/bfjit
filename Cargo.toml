@@ -7,7 +7,7 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-thiserror = "1.0.24"
-dynasm = "1.1.0"
-dynasmrt = "1.1.0"
-structopt = "0.3.21"
+thiserror = "1.0.31"
+dynasm = "1.2.3"
+dynasmrt = "1.2.3"
+structopt = "0.3.26"
