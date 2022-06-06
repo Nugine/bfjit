@@ -1,6 +1,6 @@
 [package]
 name = "bfjit"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Nugine <nugine@foxmail.com>"]
 edition = "2018"
 
@@ -10,4 +10,4 @@ edition = "2018"
 thiserror = "1.0.31"
 dynasm = "1.2.3"
 dynasmrt = "1.2.3"
-structopt = "0.3.26"
+clap = { version = "3.1.18", features = ["derive"] }

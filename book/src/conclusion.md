@@ -12,4 +12,4 @@
 
 <https://github.com/dtolnay/thiserror>
 
-<https://github.com/TeXitoi/structopt>
+<https://github.com/clap-rs/clap>

@@ -7,19 +7,20 @@ use crate::bfjit::BfVM;
 use std::io::{stdin, stdout};
 use std::path::PathBuf;
 
-use structopt::StructOpt;
+use clap::Parser;
 
-#[derive(Debug, StructOpt)]
+#[derive(Debug, clap::Parser)]
+#[clap(version)]
 struct Opt {
-    #[structopt(name = "FILE")]
+    #[clap(name = "FILE")]
     file_path: PathBuf,
 
-    #[structopt(short = "o", long = "optimize", help = "Optimize code")]
+    #[clap(short = 'o', long = "optimize", help = "Optimize code")]
     optimize: bool,
 }
 
 fn main() {
-    let opt = Opt::from_args();
+    let opt = Opt::parse();
 
     let stdin = stdin();
     let stdout = stdout();
