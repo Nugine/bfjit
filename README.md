@@ -7,3 +7,5 @@
 在本教程中，我们将用 Rust 语言实现一个简单的 Brainfuck JIT 虚拟机，逐步理解 JIT 技术。
 
 教程地址：<https://nugine.github.io/bfjit>
+
+如果本教程对您有帮助，请[赞助我的开源工作](https://github.com/Nugine#sponsor)。
