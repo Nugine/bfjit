@@ -9,7 +9,6 @@
 
         <!-- Custom HTML head -->
         
-        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff" />
@@ -34,14 +33,15 @@
 
     </head>
     <body>
+    <div id="body-container">
         <!-- Provide site root to javascript -->
-        <script type="text/javascript">
+        <script>
             var path_to_root = "";
             var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
         </script>
 
         <!-- Work around some values being stored in localStorage wrapped in quotes -->
-        <script type="text/javascript">
+        <script>
             try {
                 var theme = localStorage.getItem('mdbook-theme');
                 var sidebar = localStorage.getItem('mdbook-sidebar');
@@ -57,7 +57,7 @@
         </script>
 
         <!-- Set the theme before any content is loaded, prevents flash -->
-        <script type="text/javascript">
+        <script>
             var theme;
             try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
             if (theme === null || theme === undefined) { theme = default_theme; }
@@ -69,12 +69,14 @@
         </script>
 
         <!-- Hide / unhide sidebar before it is displayed -->
-        <script type="text/javascript">
+        <script>
             var html = document.querySelector('html');
-            var sidebar = 'hidden';
+            var sidebar = null;
             if (document.body.clientWidth >= 1080) {
                 try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
                 sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
             }
             html.classList.remove('sidebar-visible');
             html.classList.add("sidebar-" + sidebar);
@@ -100,7 +102,7 @@
                             <i class="fa fa-paint-brush"></i>
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
-                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
@@ -133,7 +135,7 @@
                 </div>
 
                 <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
-                <script type="text/javascript">
+                <script>
                     document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
                     document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
                     Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
@@ -166,7 +168,7 @@
 <pre><code class="language-c">char array[30000] = {0};
 char *ptr=array;
 </code></pre>
-<table><thead><tr><th>指令</th><th>C 代码</th></tr></thead><tbody>
+<div class="table-wrapper"><table><thead><tr><th>指令</th><th>C 代码</th></tr></thead><tbody>
 <tr><td>&gt;</td><td>++ptr;</td></tr>
 <tr><td>&lt;</td><td>--ptr;</td></tr>
 <tr><td>+</td><td>++*ptr;</td></tr>
@@ -176,6 +178,7 @@ char *ptr=array;
 <tr><td>[</td><td>while (*ptr) {</td></tr>
 <tr><td>]</td><td>}</td></tr>
 </tbody></table>
+</div>
 <p>Brainfuck 可视化</p>
 <p><a href="http://fatiherikli.github.io/brainfuck-visualizer/">http://fatiherikli.github.io/brainfuck-visualizer/</a></p>
 <h2 id="rust-资源"><a class="header" href="#rust-资源">Rust 资源</a></h2>
@@ -212,8 +215,7 @@ Hello, world!
 
 fn main() {
     println!(&quot;Hello, world!&quot;);
-}
-</code></pre>
+}</code></pre>
 <p>本节以下代码都将写入 bfir.rs</p>
 <h2 id="ir-定义"><a class="header" href="#ir-定义">IR 定义</a></h2>
 <p>AddVal, SubVal 表示将当前单元加减某一数值。</p>
@@ -229,8 +231,7 @@ pub enum BfIR {
     PutByte,     // .
     Jz,          // [
     Jnz,         // ]
-}
-</code></pre>
+}</code></pre>
 <h2 id="错误处理"><a class="header" href="#错误处理">错误处理</a></h2>
 <p>我们使用 thiserror 库，用来轻松定义错误类型。</p>
 <p><a href="https://github.com/dtolnay/thiserror">https://github.com/dtolnay/thiserror</a></p>
@@ -254,8 +255,7 @@ pub struct CompileError {
     line: u32,
     col: u32,
     kind: CompileErrorKind,
-}
-</code></pre>
+}</code></pre>
 <p>为 CompileError 实现 Display 和 Error，Display 用于对人友好的信息，Error 表明它是一个错误类型。</p>
 <pre><code class="language-rust  noplaypen">#[derive(Debug)]
 pub struct CompileError {
@@ -268,8 +268,7 @@ impl fmt::Display for CompileError {
     fn fmt(&amp;self, f: &amp;mut fmt::Formatter&lt;'_&gt;) -&gt; fmt::Result {
         write!(f, &quot;{} at line {}:{}&quot;, self.kind, self.line, self.col)
     }
-}
-</code></pre>
+}</code></pre>
 <h2 id="编译为-ir"><a class="header" href="#编译为-ir">编译为 IR</a></h2>
 <pre><code class="language-rust  noplaypen">pub fn compile(src: &amp;str) -&gt; Result&lt;Vec&lt;BfIR&gt;, CompileError&gt; {
     let mut code: Vec&lt;BfIR&gt; = vec![];
@@ -277,8 +276,7 @@ impl fmt::Display for CompileError {
     let mut stk: Vec&lt;(u32, u32, u32)&gt; = vec![];
 
     let mut line: u32 = 1;
-    let mut col: u32 = 0;
-</code></pre>
+    let mut col: u32 = 0;</code></pre>
 <p>compile 函数接收一个字符串，返回 IR 序列。</p>
 <p>code 存储已解析的 IR，stk 作为栈，存储左括号的IR位置、源代码行位置、源代码列位置，line 和 col 分别记录行号和列号。</p>
 <p>主循环结构</p>
@@ -287,29 +285,25 @@ impl fmt::Display for CompileError {
     match ch {
         ...
     }
-}
-</code></pre>
+}</code></pre>
 <p>处理换行</p>
 <pre><code class="language-rust  noplaypen">'\n' =&gt; {
     line += 1;
     col = 0;
-}
-</code></pre>
+}</code></pre>
 <p>处理普通指令</p>
 <pre><code class="language-rust  noplaypen">'+' =&gt; code.push(BfIR::AddVal(1)),
 '-' =&gt; code.push(BfIR::SubVal(1)),
 '&gt;' =&gt; code.push(BfIR::AddPtr(1)),
 '&lt;' =&gt; code.push(BfIR::SubPtr(1)),
 ',' =&gt; code.push(BfIR::GetByte),
-'.' =&gt; code.push(BfIR::PutByte),
-</code></pre>
+'.' =&gt; code.push(BfIR::PutByte),</code></pre>
 <p>处理左括号，将左括号位置入栈。</p>
 <pre><code class="language-rust  noplaypen">'[' =&gt; {
     let pos = code.len() as u32;
     stk.push((pos, line, col));
     code.push(BfIR::Jz)
-}
-</code></pre>
+}</code></pre>
 <p>处理右括号，从栈中弹出左括号位置，如果栈为空，说明没有匹配的左括号，生成一个编译错误并返回。如果有匹配的左括号，则正常生成 IR。</p>
 <pre><code class="language-rust  noplaypen">']' =&gt; {
     stk.pop().ok_or(CompileError {
@@ -319,11 +313,9 @@ impl fmt::Display for CompileError {
     })?;
 
     code.push(BfIR::Jnz)
-}
-</code></pre>
+}</code></pre>
 <p>忽略其他字符</p>
-<pre><code class="language-rust  noplaypen">_ =&gt; {}
-</code></pre>
+<pre><code class="language-rust  noplaypen">_ =&gt; {}</code></pre>
 <p>循环结束后，如果栈不为空，说明有左括号没有匹配到右括号，弹出左括号位置，生成编译错误。最后返回生成的IR.</p>
 <pre><code class="language-rust  noplaypen">if let Some((_, line, col)) = stk.pop() {
     return Err(CompileError {
@@ -332,8 +324,7 @@ impl fmt::Display for CompileError {
         kind: CompileErrorKind::UnclosedLeftBracket,
     });
 }
-Ok(code)
-</code></pre>
+Ok(code)</code></pre>
 <p>完整代码</p>
 <pre><code class="language-rust noplaypen">pub fn compile(src: &amp;str) -&gt; Result&lt;Vec&lt;BfIR&gt;, CompileError&gt; {
     let mut code: Vec&lt;BfIR&gt; = vec![];
@@ -381,8 +372,7 @@ Ok(code)
         });
     }
     Ok(code)
-}
-</code></pre>
+}</code></pre>
 <h2 id="简单优化"><a class="header" href="#简单优化">简单优化</a></h2>
 <p>brainfuck 代码中经常有连续的算术加减和指针移动，这些操作完全可以折叠起来。</p>
 <p>优化函数直接操作 IR 序列，用一次遍历完成折叠，原地操作。时间复杂度 O(n)，空间复杂度 O(1)。</p>
@@ -431,8 +421,7 @@ Ok(code)
 
     code.truncate(pc);
     code.shrink_to_fit();
-}
-</code></pre>
+}</code></pre>
 <h2 id="简单测试"><a class="header" href="#简单测试">简单测试</a></h2>
 <p>Rust 内置一套单元测试框架，在模块内随手写个函数，标上 <code>#[test]</code>，然后运行命令 <code>cargo test</code>。cargo 会收集所有测试，逐个运行，并报告结果。</p>
 <pre><code class="language-rust noplaypen">#[test]
@@ -461,8 +450,7 @@ fn test_compile() {
     let mut code = compile(&quot;[+++++]&quot;).unwrap();
     optimize(&amp;mut code);
     assert_eq!(code, vec![BfIR::Jz, BfIR::AddVal(5), BfIR::Jnz]);
-}
-</code></pre>
+}</code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="4-hello-jit"><a class="header" href="#4-hello-jit">4. Hello, JIT</a></h1>
 <p>通常来说，Just In Time (JIT) 编译器 是指在某段高阶代码即将运行时将其编译到机器码再执行的程序。下文中，我们把这样的程序叫做 &quot;JIT&quot;。</p>
 <p>一个最简单的 JIT 工作方式是这样的：</p>
@@ -521,15 +509,13 @@ int main(int argc, char *argv[]) {
 use dynasm::dynasm;
 use dynasmrt::{DynasmApi, DynasmLabelApi};
 
-use std::io::{stdout, Write};
-</code></pre>
+use std::io::{stdout, Write};</code></pre>
 <p>编写 print 函数，使用 &quot;sysv64&quot; ABI。</p>
 <p>x86-64 Linux 系统上默认为 System V ABI. <a href="https://github.com/hjl-tools/x86-psABI/wiki/X86-psABI">相关文档</a></p>
 <pre><code class="language-rust  noplaypen">unsafe extern &quot;sysv64&quot; fn print(buf: *const u8, len: u64) -&gt; u8 {
     let buf = std::slice::from_raw_parts(buf, len as usize);
     stdout().write_all(buf).is_err() as u8
-}
-</code></pre>
+}</code></pre>
 <p>首先初始化汇编器，指定架构为 x64，全局标签 hello 指向字符串。</p>
 <pre><code class="language-rust  noplaypen">fn main() {
     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
@@ -539,8 +525,7 @@ use std::io::{stdout, Write};
         ; .arch x64
         ; -&gt;hello:
         ; .bytes string
-    );
-</code></pre>
+    );</code></pre>
 <p>dynasm 使用 nasm 的方言，左操作数为目标，右操作数为源。</p>
 <p>sysv64 调用约定规定 rdi, rsi, rdx, rcx 存放前四个整数参数，rax 存放返回值。</p>
 <pre><code class="language-rust  noplaypen">    let hello = ops.offset();
@@ -550,8 +535,7 @@ use std::io::{stdout, Write};
         ; mov rax, QWORD print as _         // 将 print 函数地址放入 rax
         ; call rax                          // 调用函数
         ; ret                               // 返回
-    );
-</code></pre>
+    );</code></pre>
 <p>完成汇编，取得可执行缓冲区。根据偏移拿到函数地址，强制转换为函数指针。最后调用机器码，得到结果。</p>
 <pre><code class="language-rust  noplaypen">    let buf = ops.finalize().unwrap();
 
@@ -561,8 +545,7 @@ use std::io::{stdout, Write};
     let ret = unsafe { hello_fn() };
 
     assert_eq!(ret, 0);
-}
-</code></pre>
+}</code></pre>
 <p>运行结果</p>
 <pre><code class="language-bash">$ cargo run
     Finished dev [unoptimized + debuginfo] target(s) in 1.30s
@@ -609,14 +592,12 @@ fn main() {
     let ret = unsafe { hello_fn() };
 
     assert_eq!(ret, 0);
-}
-</code></pre>
+}</code></pre>
 <h2 id="如何处理-panic"><a class="header" href="#如何处理-panic">如何处理 panic</a></h2>
 <p>跨越 Rust 边界的 panic 是未定义行为，我们很难让汇编去匹配 unwind ABI。</p>
 <p>暴露给外部调用的 Rust 函数最好捕获 panic，用其他方式去处理。</p>
 <p>例如这样 </p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>unsafe extern &quot;sysv64&quot; fn print(buf: *const u8, len: u64) -&gt; u8 {
     let ret = std::panic::catch_unwind(|| {
@@ -629,13 +610,11 @@ fn main() {
         Err(_) =&gt; 2,
     }
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="5-来点错误"><a class="header" href="#5-来点错误">5. 来点错误</a></h1>
 <p>添加一个错误模块</p>
 <p>src/main.rs</p>
-<pre><code class="language-rust  noplaypen">mod error;
-</code></pre>
+<pre><code class="language-rust  noplaypen">mod error;</code></pre>
 <p>src/error.rs</p>
 <pre><code class="language-rust  noplaypen">#[derive(Debug, thiserror::Error)]
 pub enum RuntimeError {
@@ -658,8 +637,7 @@ pub enum VMError {
     Runtime(#[from] RuntimeError),
 }
 
-pub type Result&lt;T&gt; = std::result::Result&lt;T, VMError&gt;;
-</code></pre>
+pub type Result&lt;T&gt; = std::result::Result&lt;T, VMError&gt;;</code></pre>
 <p>虚拟机运行时可能出现两种错误，IO 错误和指针溢出。</p>
 <p>虚拟机首先需要读取源代码，可能出现IO错误，然后将源代码编译为 IR，可能发生编译错误，最后运行程序，可能有运行时错误。</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="6-实现虚拟机"><a class="header" href="#6-实现虚拟机">6. 实现虚拟机</a></h1>
@@ -673,8 +651,7 @@ use std::path::Path;
 use std::ptr;
 
 use dynasm::dynasm;
-use dynasmrt::{DynasmApi, DynasmLabelApi};
-</code></pre>
+use dynasmrt::{DynasmApi, DynasmLabelApi};</code></pre>
 <p>虚拟机定义与 Brainfuck 机器模型一致。</p>
 <p>机器码缓冲区，起始偏移，字节数组，输入输出流。</p>
 <p>字节数组大小至少为 30000，这里设置为 4 MiB.</p>
@@ -684,8 +661,7 @@ use dynasmrt::{DynasmApi, DynasmLabelApi};
     memory: Box&lt;[u8]&gt;,
     input: Box&lt;dyn Read + 'io&gt;,
     output: Box&lt;dyn Write + 'io&gt;,
-}
-</code></pre>
+}</code></pre>
 <p>准备汇编可调用的函数，brainfuck 通过 unsafe 函数与虚拟机交互。</p>
 <p>为了传出可能的错误，把错误移动到堆上，返回裸指针。您也可以选择其他方式来传出错误。</p>
 <p>在 FFI 时完善地处理 panic 和 backtrace 是一个复杂的问题。为了不增加过多处理代码，这里选择忽略 unsafe 函数中的 panic 问题。在代码正确的情况下，panic 应该不会发生。</p>
@@ -721,15 +697,13 @@ impl&lt;'io&gt; BfVM&lt;'io&gt; {
     unsafe extern &quot;sysv64&quot; fn overflow_error() -&gt; *mut VMError {
         vm_error(RuntimeError::PointerOverflow)
     }
-}
-</code></pre>
+}</code></pre>
 <p>用输入流、输出流、源文件路径初始化虚拟机，优化选项也由外部提供。</p>
 <p>compile 方法暂时留空。</p>
 <pre><code class="language-rust  noplaypen">impl&lt;'io&gt; BfVM&lt;'io&gt; {
     fn compile(code: &amp;[BfIR]) -&gt; Result&lt;(dynasmrt::ExecutableBuffer, dynasmrt::AssemblyOffset)&gt; {
         todo!()
-    }
-</code></pre>
+    }</code></pre>
 <pre><code class="language-rust noplaypen">impl&lt;'io&gt; BfVM&lt;'io&gt; {
     pub fn new(
         file_path: &amp;Path,
@@ -755,8 +729,7 @@ impl&lt;'io&gt; BfVM&lt;'io&gt; {
             input,
             output,
         })
-    }
-</code></pre>
+    }</code></pre>
 <p>即时编译出的裸函数接收虚拟机指针和字节数组的边界指针，返回错误指针。</p>
 <p>执行函数后检查错误指针，如果非空，就把错误从堆上移动到栈上再返回。</p>
 <pre><code class="language-rust noplaypen">    pub fn run(&amp;mut self) -&gt; Result&lt;()&gt; {
@@ -779,8 +752,7 @@ impl&lt;'io&gt; BfVM&lt;'io&gt; {
         } else {
             Err(*unsafe { Box::from_raw(ret) })
         }
-    }
-</code></pre>
+    }</code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="7-生成机器码"><a class="header" href="#7-生成机器码">7. 生成机器码</a></h1>
 <p>完成上一节留空的 compile 方法。</p>
 <p>首先初始化汇编器。整个 brainfuck 程序编译为一个大函数，函数起始地址就是最开始的偏移。</p>
@@ -791,15 +763,13 @@ impl&lt;'io&gt; BfVM&lt;'io&gt; {
         let mut ops = dynasmrt::x64::Assembler::new()?;
         let start = ops.offset();
 
-        let mut loops = vec![];
-</code></pre>
+        let mut loops = vec![];</code></pre>
 <p>sysv64 调用约定规定 rdi, rsi, rdx, rcx 存放前四个整数参数，rax 存放返回值。</p>
 <p>在注释中约定各个寄存器存放的参数，虚拟机调用裸函数时将把参数放入寄存器。</p>
 <pre><code class="language-rust noplaypen">        // this:         rdi r12
         // memory_start: rsi r13
         // memory_end:   rdx r14
-        // ptr:          rcx r15
-</code></pre>
+        // ptr:          rcx r15</code></pre>
 <p>程序开始，首先把 rax 压栈。x86-64-psABI 规定参数区域的结尾按16字节对齐。函数开始时返回地址压栈，此时 栈指针+8 是 16 的倍数，因此再把 rax 压栈，使栈指针对齐，以便之后的函数调用，rax 的内容没有意义。</p>
 <p>把寄存器中的各参数存入非易失性寄存器，调用其他函数时参数寄存器的值可能丢失。rbp, rbx, r12 ~ r15 是非易失性寄存器。</p>
 <pre><code class="language-rust noplaypen">        dynasm!(ops
@@ -808,8 +778,7 @@ impl&lt;'io&gt; BfVM&lt;'io&gt; {
             ; mov r13, rsi   // save memory_start
             ; mov r14, rdx   // save memory_end
             ; mov rcx, rsi   // ptr = memory_start
-        );
-</code></pre>
+        );</code></pre>
 <p>每个 IR 依次映射到汇编。</p>
 <p>指针移动，需要检查算术溢出和数组边界溢出，出错即跳转到全局标签所指的错误处理区域。</p>
 <pre><code class="language-rust noplaypen">        use BfIR::*;
@@ -826,16 +795,14 @@ impl&lt;'io&gt; BfVM&lt;'io&gt; {
                     ; jc  -&gt;overflow        // jmp if overflow
                     ; cmp rcx, r13          // ptr - memory_start
                     ; jb  -&gt;overflow        // jmp if ptr &lt; memory_start
-                ),
-</code></pre>
+                ),</code></pre>
 <p>单个字节的算术加减，允许溢出。</p>
 <pre><code class="language-rust noplaypen">                AddVal(x) =&gt; dynasm!(ops
                     ; add BYTE [rcx], x as i8    // *ptr += x
                 ),
                 SubVal(x) =&gt; dynasm!(ops
                     ; sub BYTE [rcx], x as i8    // *ptr -= x
-                ),
-</code></pre>
+                ),</code></pre>
 <p>IO 操作。首先保存当前数据指针寄存器，将虚拟机函数所需的各参数和函数地址放入寄存器，调用函数。</p>
 <p>如果函数返回的不是空指针，说明出错，应该跳转到IO错误处理区域。</p>
 <p>最后恢复数据指针寄存器。</p>
@@ -858,8 +825,7 @@ impl&lt;'io&gt; BfVM&lt;'io&gt; {
                     ; test rax, rax
                     ; jnz  -&gt;io_error       // jmp if rax != 0
                     ; mov  rcx, r15         // recover ptr
-                ),
-</code></pre>
+                ),</code></pre>
 <p>跳转指令。利用 dynasm 提供的 api， 创建两个动态标签，分别生成跳转汇编。由于编译到 IR 时已经验证过跳转指令的对应关系，这里的栈可以直接弹出。</p>
 <pre><code class="language-rust noplaypen">                Jz =&gt; {
                     let left = ops.new_dynamic_label();
@@ -881,8 +847,7 @@ impl&lt;'io&gt; BfVM&lt;'io&gt; {
                     )
                 }
             }
-        }
-</code></pre>
+        }</code></pre>
 <p>正常退出函数时应该返回空指针，表示没有错误。</p>
 <p>溢出时生成一个溢出错误，IO错误时错误指针已经存入 rax，无需处理。</p>
 <p>最后退栈，与函数开始时的压栈对应，维持栈平衡。</p>
@@ -897,14 +862,12 @@ impl&lt;'io&gt; BfVM&lt;'io&gt; {
             ; exit:
             ; pop rdx
             ; ret
-        );
-</code></pre>
+        );</code></pre>
 <p>完成汇编，取出可执行缓冲区，返回。</p>
 <pre><code class="language-rust noplaypen">        let code = ops.finalize().unwrap();
 
         Ok((code, start))
-    }
-</code></pre>
+    }</code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="命令行界面"><a class="header" href="#命令行界面">命令行界面</a></h1>
 <p>虚拟机已经完成，剩下的就是把它包装成命令行界面 (CLI) 了。</p>
 <p>我们使用 clap 库，用结构体定义命令行参数解析。</p>
@@ -952,23 +915,19 @@ fn main() {
     }
 
     std::process::exit(ret.is_err() as i32)
-}
-</code></pre>
+}</code></pre>
 <p>把写好的命令行应用安装到系统。</p>
 <pre><code class="language-bash">$ cargo install --path .
 $ bfjit --help
-bfjit 0.1.2
+Usage: bfjit [OPTIONS] &lt;FILE&gt;
 
-USAGE:
-    bfjit [OPTIONS] &lt;FILE&gt;
+Arguments:
+  &lt;FILE&gt;  
 
-ARGS:
-    &lt;FILE&gt;    
-
-OPTIONS:
-    -h, --help        Print help information
-    -o, --optimize    Optimize code
-    -V, --version     Print version information
+Options:
+  -o, --optimize  Optimize code
+  -h, --help      Print help
+  -V, --version   Print version
 </code></pre>
 <p>从 github 上找一些 brainfuck 程序运行，观察 JIT 与解释器的效率差别。</p>
 <pre><code class="language-bash">$ bfjit bf/hello.bf
@@ -990,7 +949,7 @@ sys     0m0.010s
 <p>甚至可以运行一层 brainfuck 自解释器。</p>
 <p>注意：多层自解释器的效率会严重下降，短时间内无法得出结果。</p>
 <p><a href="https://github.com/cagataycali/awesome-brainfuck">https://github.com/cagataycali/awesome-brainfuck</a></p>
-<p><a href="http://homepages.xnet.co.nz/%7Eclive/eigenratios/cgbfi2.b">http://homepages.xnet.co.nz/~clive/eigenratios/cgbfi2.b</a></p>
+<p><a href="http://homepages.xnet.co.nz/~clive/eigenratios/cgbfi2.b">http://homepages.xnet.co.nz/~clive/eigenratios/cgbfi2.b</a></p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="结语"><a class="header" href="#结语">结语</a></h1>
 <p>本教程基于 dynasm 实现了一个 Brainfuck JIT 虚拟机，主要功能有 Brainfuck 解析编译、简单优化、动态生成机器码，并提供了友好的命令行界面。</p>
 <p>希望本项目对有兴趣深入研究 JIT 技术的人有所帮助。</p>
@@ -1020,26 +979,27 @@ sys     0m0.010s
 
 
 
-        <script type="text/javascript">
+        <script>
             window.playground_copyable = true;
         </script>
 
 
-        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
 
-        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
-        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
 
         <!-- Custom JS scripts -->
 
-        <script type="text/javascript">
+        <script>
         window.addEventListener('load', function() {
             window.setTimeout(window.print, 100);
         });
         </script>
 
+    </div>
     </body>
 </html>

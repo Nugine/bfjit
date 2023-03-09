@@ -8,7 +8,6 @@
 
         <!-- Custom HTML head -->
         
-        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff" />
@@ -33,14 +32,15 @@
 
     </head>
     <body>
+    <div id="body-container">
         <!-- Provide site root to javascript -->
-        <script type="text/javascript">
+        <script>
             var path_to_root = "";
             var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
         </script>
 
         <!-- Work around some values being stored in localStorage wrapped in quotes -->
-        <script type="text/javascript">
+        <script>
             try {
                 var theme = localStorage.getItem('mdbook-theme');
                 var sidebar = localStorage.getItem('mdbook-sidebar');
@@ -56,7 +56,7 @@
         </script>
 
         <!-- Set the theme before any content is loaded, prevents flash -->
-        <script type="text/javascript">
+        <script>
             var theme;
             try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
             if (theme === null || theme === undefined) { theme = default_theme; }
@@ -68,12 +68,14 @@
         </script>
 
         <!-- Hide / unhide sidebar before it is displayed -->
-        <script type="text/javascript">
+        <script>
             var html = document.querySelector('html');
-            var sidebar = 'hidden';
+            var sidebar = null;
             if (document.body.clientWidth >= 1080) {
                 try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
                 sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
             }
             html.classList.remove('sidebar-visible');
             html.classList.add("sidebar-" + sidebar);
@@ -99,7 +101,7 @@
                             <i class="fa fa-paint-brush"></i>
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
-                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
@@ -132,7 +134,7 @@
                 </div>
 
                 <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
-                <script type="text/javascript">
+                <script>
                     document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
                     document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
                     Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
@@ -152,15 +154,13 @@
         let mut ops = dynasmrt::x64::Assembler::new()?;
         let start = ops.offset();
 
-        let mut loops = vec![];
-</code></pre>
+        let mut loops = vec![];</code></pre>
 <p>sysv64 调用约定规定 rdi, rsi, rdx, rcx 存放前四个整数参数，rax 存放返回值。</p>
 <p>在注释中约定各个寄存器存放的参数，虚拟机调用裸函数时将把参数放入寄存器。</p>
 <pre><code class="language-rust noplaypen">        // this:         rdi r12
         // memory_start: rsi r13
         // memory_end:   rdx r14
-        // ptr:          rcx r15
-</code></pre>
+        // ptr:          rcx r15</code></pre>
 <p>程序开始，首先把 rax 压栈。x86-64-psABI 规定参数区域的结尾按16字节对齐。函数开始时返回地址压栈，此时 栈指针+8 是 16 的倍数，因此再把 rax 压栈，使栈指针对齐，以便之后的函数调用，rax 的内容没有意义。</p>
 <p>把寄存器中的各参数存入非易失性寄存器，调用其他函数时参数寄存器的值可能丢失。rbp, rbx, r12 ~ r15 是非易失性寄存器。</p>
 <pre><code class="language-rust noplaypen">        dynasm!(ops
@@ -169,8 +169,7 @@
             ; mov r13, rsi   // save memory_start
             ; mov r14, rdx   // save memory_end
             ; mov rcx, rsi   // ptr = memory_start
-        );
-</code></pre>
+        );</code></pre>
 <p>每个 IR 依次映射到汇编。</p>
 <p>指针移动，需要检查算术溢出和数组边界溢出，出错即跳转到全局标签所指的错误处理区域。</p>
 <pre><code class="language-rust noplaypen">        use BfIR::*;
@@ -187,16 +186,14 @@
                     ; jc  -&gt;overflow        // jmp if overflow
                     ; cmp rcx, r13          // ptr - memory_start
                     ; jb  -&gt;overflow        // jmp if ptr &lt; memory_start
-                ),
-</code></pre>
+                ),</code></pre>
 <p>单个字节的算术加减，允许溢出。</p>
 <pre><code class="language-rust noplaypen">                AddVal(x) =&gt; dynasm!(ops
                     ; add BYTE [rcx], x as i8    // *ptr += x
                 ),
                 SubVal(x) =&gt; dynasm!(ops
                     ; sub BYTE [rcx], x as i8    // *ptr -= x
-                ),
-</code></pre>
+                ),</code></pre>
 <p>IO 操作。首先保存当前数据指针寄存器，将虚拟机函数所需的各参数和函数地址放入寄存器，调用函数。</p>
 <p>如果函数返回的不是空指针，说明出错，应该跳转到IO错误处理区域。</p>
 <p>最后恢复数据指针寄存器。</p>
@@ -219,8 +216,7 @@
                     ; test rax, rax
                     ; jnz  -&gt;io_error       // jmp if rax != 0
                     ; mov  rcx, r15         // recover ptr
-                ),
-</code></pre>
+                ),</code></pre>
 <p>跳转指令。利用 dynasm 提供的 api， 创建两个动态标签，分别生成跳转汇编。由于编译到 IR 时已经验证过跳转指令的对应关系，这里的栈可以直接弹出。</p>
 <pre><code class="language-rust noplaypen">                Jz =&gt; {
                     let left = ops.new_dynamic_label();
@@ -242,8 +238,7 @@
                     )
                 }
             }
-        }
-</code></pre>
+        }</code></pre>
 <p>正常退出函数时应该返回空指针，表示没有错误。</p>
 <p>溢出时生成一个溢出错误，IO错误时错误指针已经存入 rax，无需处理。</p>
 <p>最后退栈，与函数开始时的压栈对应，维持栈平衡。</p>
@@ -258,14 +253,12 @@
             ; exit:
             ; pop rdx
             ; ret
-        );
-</code></pre>
+        );</code></pre>
 <p>完成汇编，取出可执行缓冲区，返回。</p>
 <pre><code class="language-rust noplaypen">        let code = ops.finalize().unwrap();
 
         Ok((code, start))
-    }
-</code></pre>
+    }</code></pre>
 
                     </main>
 
@@ -299,21 +292,22 @@
 
 
 
-        <script type="text/javascript">
+        <script>
             window.playground_copyable = true;
         </script>
 
 
-        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
 
-        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
-        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
 
         <!-- Custom JS scripts -->
 
 
+    </div>
     </body>
 </html>

@@ -8,7 +8,6 @@
 
         <!-- Custom HTML head -->
         
-        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff" />
@@ -33,14 +32,15 @@
 
     </head>
     <body>
+    <div id="body-container">
         <!-- Provide site root to javascript -->
-        <script type="text/javascript">
+        <script>
             var path_to_root = "";
             var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
         </script>
 
         <!-- Work around some values being stored in localStorage wrapped in quotes -->
-        <script type="text/javascript">
+        <script>
             try {
                 var theme = localStorage.getItem('mdbook-theme');
                 var sidebar = localStorage.getItem('mdbook-sidebar');
@@ -56,7 +56,7 @@
         </script>
 
         <!-- Set the theme before any content is loaded, prevents flash -->
-        <script type="text/javascript">
+        <script>
             var theme;
             try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
             if (theme === null || theme === undefined) { theme = default_theme; }
@@ -68,12 +68,14 @@
         </script>
 
         <!-- Hide / unhide sidebar before it is displayed -->
-        <script type="text/javascript">
+        <script>
             var html = document.querySelector('html');
-            var sidebar = 'hidden';
+            var sidebar = null;
             if (document.body.clientWidth >= 1080) {
                 try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
                 sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
             }
             html.classList.remove('sidebar-visible');
             html.classList.add("sidebar-" + sidebar);
@@ -99,7 +101,7 @@
                             <i class="fa fa-paint-brush"></i>
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
-                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
@@ -132,7 +134,7 @@
                 </div>
 
                 <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
-                <script type="text/javascript">
+                <script>
                     document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
                     document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
                     Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
@@ -158,8 +160,7 @@
 
 fn main() {
     println!(&quot;Hello, world!&quot;);
-}
-</code></pre>
+}</code></pre>
 <p>本节以下代码都将写入 bfir.rs</p>
 <h2 id="ir-定义"><a class="header" href="#ir-定义">IR 定义</a></h2>
 <p>AddVal, SubVal 表示将当前单元加减某一数值。</p>
@@ -175,8 +176,7 @@ pub enum BfIR {
     PutByte,     // .
     Jz,          // [
     Jnz,         // ]
-}
-</code></pre>
+}</code></pre>
 <h2 id="错误处理"><a class="header" href="#错误处理">错误处理</a></h2>
 <p>我们使用 thiserror 库，用来轻松定义错误类型。</p>
 <p><a href="https://github.com/dtolnay/thiserror">https://github.com/dtolnay/thiserror</a></p>
@@ -200,8 +200,7 @@ pub struct CompileError {
     line: u32,
     col: u32,
     kind: CompileErrorKind,
-}
-</code></pre>
+}</code></pre>
 <p>为 CompileError 实现 Display 和 Error，Display 用于对人友好的信息，Error 表明它是一个错误类型。</p>
 <pre><code class="language-rust  noplaypen">#[derive(Debug)]
 pub struct CompileError {
@@ -214,8 +213,7 @@ impl fmt::Display for CompileError {
     fn fmt(&amp;self, f: &amp;mut fmt::Formatter&lt;'_&gt;) -&gt; fmt::Result {
         write!(f, &quot;{} at line {}:{}&quot;, self.kind, self.line, self.col)
     }
-}
-</code></pre>
+}</code></pre>
 <h2 id="编译为-ir"><a class="header" href="#编译为-ir">编译为 IR</a></h2>
 <pre><code class="language-rust  noplaypen">pub fn compile(src: &amp;str) -&gt; Result&lt;Vec&lt;BfIR&gt;, CompileError&gt; {
     let mut code: Vec&lt;BfIR&gt; = vec![];
@@ -223,8 +221,7 @@ impl fmt::Display for CompileError {
     let mut stk: Vec&lt;(u32, u32, u32)&gt; = vec![];
 
     let mut line: u32 = 1;
-    let mut col: u32 = 0;
-</code></pre>
+    let mut col: u32 = 0;</code></pre>
 <p>compile 函数接收一个字符串，返回 IR 序列。</p>
 <p>code 存储已解析的 IR，stk 作为栈，存储左括号的IR位置、源代码行位置、源代码列位置，line 和 col 分别记录行号和列号。</p>
 <p>主循环结构</p>
@@ -233,29 +230,25 @@ impl fmt::Display for CompileError {
     match ch {
         ...
     }
-}
-</code></pre>
+}</code></pre>
 <p>处理换行</p>
 <pre><code class="language-rust  noplaypen">'\n' =&gt; {
     line += 1;
     col = 0;
-}
-</code></pre>
+}</code></pre>
 <p>处理普通指令</p>
 <pre><code class="language-rust  noplaypen">'+' =&gt; code.push(BfIR::AddVal(1)),
 '-' =&gt; code.push(BfIR::SubVal(1)),
 '&gt;' =&gt; code.push(BfIR::AddPtr(1)),
 '&lt;' =&gt; code.push(BfIR::SubPtr(1)),
 ',' =&gt; code.push(BfIR::GetByte),
-'.' =&gt; code.push(BfIR::PutByte),
-</code></pre>
+'.' =&gt; code.push(BfIR::PutByte),</code></pre>
 <p>处理左括号，将左括号位置入栈。</p>
 <pre><code class="language-rust  noplaypen">'[' =&gt; {
     let pos = code.len() as u32;
     stk.push((pos, line, col));
     code.push(BfIR::Jz)
-}
-</code></pre>
+}</code></pre>
 <p>处理右括号，从栈中弹出左括号位置，如果栈为空，说明没有匹配的左括号，生成一个编译错误并返回。如果有匹配的左括号，则正常生成 IR。</p>
 <pre><code class="language-rust  noplaypen">']' =&gt; {
     stk.pop().ok_or(CompileError {
@@ -265,11 +258,9 @@ impl fmt::Display for CompileError {
     })?;
 
     code.push(BfIR::Jnz)
-}
-</code></pre>
+}</code></pre>
 <p>忽略其他字符</p>
-<pre><code class="language-rust  noplaypen">_ =&gt; {}
-</code></pre>
+<pre><code class="language-rust  noplaypen">_ =&gt; {}</code></pre>
 <p>循环结束后，如果栈不为空，说明有左括号没有匹配到右括号，弹出左括号位置，生成编译错误。最后返回生成的IR.</p>
 <pre><code class="language-rust  noplaypen">if let Some((_, line, col)) = stk.pop() {
     return Err(CompileError {
@@ -278,8 +269,7 @@ impl fmt::Display for CompileError {
         kind: CompileErrorKind::UnclosedLeftBracket,
     });
 }
-Ok(code)
-</code></pre>
+Ok(code)</code></pre>
 <p>完整代码</p>
 <pre><code class="language-rust noplaypen">pub fn compile(src: &amp;str) -&gt; Result&lt;Vec&lt;BfIR&gt;, CompileError&gt; {
     let mut code: Vec&lt;BfIR&gt; = vec![];
@@ -327,8 +317,7 @@ Ok(code)
         });
     }
     Ok(code)
-}
-</code></pre>
+}</code></pre>
 <h2 id="简单优化"><a class="header" href="#简单优化">简单优化</a></h2>
 <p>brainfuck 代码中经常有连续的算术加减和指针移动，这些操作完全可以折叠起来。</p>
 <p>优化函数直接操作 IR 序列，用一次遍历完成折叠，原地操作。时间复杂度 O(n)，空间复杂度 O(1)。</p>
@@ -377,8 +366,7 @@ Ok(code)
 
     code.truncate(pc);
     code.shrink_to_fit();
-}
-</code></pre>
+}</code></pre>
 <h2 id="简单测试"><a class="header" href="#简单测试">简单测试</a></h2>
 <p>Rust 内置一套单元测试框架，在模块内随手写个函数，标上 <code>#[test]</code>，然后运行命令 <code>cargo test</code>。cargo 会收集所有测试，逐个运行，并报告结果。</p>
 <pre><code class="language-rust noplaypen">#[test]
@@ -407,8 +395,7 @@ fn test_compile() {
     let mut code = compile(&quot;[+++++]&quot;).unwrap();
     optimize(&amp;mut code);
     assert_eq!(code, vec![BfIR::Jz, BfIR::AddVal(5), BfIR::Jnz]);
-}
-</code></pre>
+}</code></pre>
 
                     </main>
 
@@ -442,21 +429,22 @@ fn test_compile() {
 
 
 
-        <script type="text/javascript">
+        <script>
             window.playground_copyable = true;
         </script>
 
 
-        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
 
-        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
-        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
 
         <!-- Custom JS scripts -->
 
 
+    </div>
     </body>
 </html>
