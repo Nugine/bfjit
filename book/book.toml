@@ -6,4 +6,4 @@ src = "src"
 title = "Brainfuck JIT 虚拟机教程"
 
 [build]
-build-dir = "../docs"
+build-dir = "../dist"
