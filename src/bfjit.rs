@@ -78,7 +78,6 @@ impl<'io> BfVM<'io> {
         })
     }
 
-    #[inline(never)]
     pub fn run(&mut self) -> Result<()> {
         type RawFn = unsafe extern "sysv64" fn(
             this: *mut BfVM<'_>,
@@ -93,6 +92,7 @@ impl<'io> BfVM<'io> {
         let memory_end = unsafe { memory_start.add(MEMORY_SIZE) };
 
         let ret: *mut VMError = unsafe { raw_fn(this, memory_start, memory_end) };
+
         if ret.is_null() {
             Ok(())
         } else {
@@ -112,56 +112,56 @@ impl BfVM<'_> {
         // this:         rdi r12
         // memory_start: rsi r13
         // memory_end:   rdx r14
-        // ptr:          rcx r15
+        // ptr:              r15
 
         dynasm!(ops
             ; push rax
+            ; push r12
+            ; push r13
+            ; push r14
+            ; push r15
             ; mov r12, rdi   // save this
             ; mov r13, rsi   // save memory_start
             ; mov r14, rdx   // save memory_end
-            ; mov rcx, rsi   // ptr = memory_start
+            ; mov r15, rsi   // ptr = memory_start
         );
 
         use BfIR::*;
         for &ir in code {
             match ir {
                 AddPtr(x) => dynasm!(ops
-                    ; add rcx, x as i32     // ptr += x
+                    ; add r15, x as i32     // ptr += x
                     ; jc  ->overflow        // jmp if overflow
-                    ; cmp rcx, r14          // ptr - memory_end
+                    ; cmp r15, r14          // ptr - memory_end
                     ; jnb ->overflow        // jmp if ptr >= memory_end
                 ),
                 SubPtr(x) => dynasm!(ops
-                    ; sub rcx, x as i32     // ptr -= x
+                    ; sub r15, x as i32     // ptr -= x
                     ; jc  ->overflow        // jmp if overflow
-                    ; cmp rcx, r13          // ptr - memory_start
+                    ; cmp r15, r13          // ptr - memory_start
                     ; jb  ->overflow        // jmp if ptr < memory_start
                 ),
                 AddVal(x) => dynasm!(ops
-                    ; add BYTE [rcx], x as i8    // *ptr += x
+                    ; add BYTE [r15], x as i8    // *ptr += x
                 ),
                 SubVal(x) => dynasm!(ops
-                    ; sub BYTE [rcx], x as i8    // *ptr -= x
+                    ; sub BYTE [r15], x as i8    // *ptr -= x
                 ),
                 GetByte => dynasm!(ops
-                    ; mov  r15, rcx         // save ptr
-                    ; mov  rdi, r12
-                    ; mov  rsi, rcx         // arg0: this, arg1: ptr
+                    ; mov  rdi, r12         // arg0: this
+                    ; mov  rsi, r15         // arg1: ptr
                     ; mov  rax, QWORD BfVM::getbyte as _
                     ; call rax              // getbyte(this, ptr)
                     ; test rax, rax
                     ; jnz  ->io_error       // jmp if rax != 0
-                    ; mov  rcx, r15         // recover ptr
                 ),
                 PutByte => dynasm!(ops
-                    ; mov  r15, rcx         // save ptr
-                    ; mov  rdi, r12
-                    ; mov  rsi, rcx         // arg0: this, arg1: ptr
+                    ; mov  rdi, r12         // arg0: this
+                    ; mov  rsi, r15         // arg1: ptr
                     ; mov  rax, QWORD BfVM::putbyte as _
                     ; call rax              // putbyte(this, ptr)
                     ; test rax, rax
                     ; jnz  ->io_error       // jmp if rax != 0
-                    ; mov  rcx, r15         // recover ptr
                 ),
                 Jz => {
                     let left = ops.new_dynamic_label();
@@ -169,7 +169,7 @@ impl BfVM<'_> {
                     loops.push((left, right));
 
                     dynasm!(ops
-                        ; cmp BYTE [rcx], 0
+                        ; cmp BYTE [r15], 0
                         ; jz => right       // jmp if *ptr == 0
                         ; => left
                     )
@@ -177,7 +177,7 @@ impl BfVM<'_> {
                 Jnz => {
                     let (left, right) = loops.pop().unwrap();
                     dynasm!(ops
-                        ; cmp BYTE [rcx], 0
+                        ; cmp BYTE [r15], 0
                         ; jnz => left       // jmp if *ptr != 0
                         ; => right
                     )
@@ -194,6 +194,10 @@ impl BfVM<'_> {
             ; jmp >exit
             ; -> io_error:
             ; exit:
+            ; pop r15
+            ; pop r14
+            ; pop r13
+            ; pop r12
             ; pop rdx
             ; ret
         );

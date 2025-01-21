@@ -16,3 +16,6 @@ thiserror = "2.0.11"
 dynasm = "3.0.1"
 dynasmrt = "3.0.1"
 clap = { version = "4.5.27", features = ["derive"] }
+
+[profile.release]
+debug = "full"
