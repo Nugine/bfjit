@@ -1,6 +1,6 @@
 [package]
 name = "bfjit"
-version = "0.1.3"
+version = "0.1.4"
 authors = ["Nugine <nugine@foxmail.com>"]
 edition = "2021"
 license = "AGPL-3.0"
