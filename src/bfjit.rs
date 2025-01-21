@@ -24,7 +24,7 @@ fn vm_error(re: RuntimeError) -> *mut VMError {
     Box::into_raw(e)
 }
 
-impl<'io> BfVM<'io> {
+impl BfVM<'_> {
     unsafe extern "sysv64" fn getbyte(this: *mut Self, ptr: *mut u8) -> *mut VMError {
         let mut buf = [0_u8];
         let this = &mut *this;
@@ -92,7 +92,6 @@ impl<'io> BfVM<'io> {
         let memory_end = unsafe { memory_start.add(MEMORY_SIZE) };
 
         let ret: *mut VMError = unsafe { raw_fn(this, memory_start, memory_end) };
-
         if ret.is_null() {
             Ok(())
         } else {
@@ -101,7 +100,7 @@ impl<'io> BfVM<'io> {
     }
 }
 
-impl<'io> BfVM<'io> {
+impl BfVM<'_> {
     #[allow(clippy::fn_to_numeric_cast)]
     fn compile(code: &[BfIR]) -> Result<(dynasmrt::ExecutableBuffer, dynasmrt::AssemblyOffset)> {
         let mut ops = dynasmrt::x64::Assembler::new()?;
