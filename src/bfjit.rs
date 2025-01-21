@@ -78,6 +78,7 @@ impl<'io> BfVM<'io> {
         })
     }
 
+    #[inline(never)]
     pub fn run(&mut self) -> Result<()> {
         type RawFn = unsafe extern "sysv64" fn(
             this: *mut BfVM<'_>,
