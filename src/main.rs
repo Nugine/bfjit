@@ -34,7 +34,7 @@ fn main() {
     .and_then(|mut vm| vm.run());
 
     if let Err(e) = &ret {
-        eprintln!("bfjit: {}", e);
+        eprintln!("bfjit: {e}");
     }
 
     std::process::exit(ret.is_err() as i32)
