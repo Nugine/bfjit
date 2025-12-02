@@ -150,7 +150,7 @@ impl BfVM<'_> {
                 GetByte => dynasm!(ops
                     ; mov  rdi, r12         // arg0: this
                     ; mov  rsi, r15         // arg1: ptr
-                    ; mov  rax, QWORD BfVM::getbyte as _
+                    ; mov  rax, QWORD BfVM::getbyte as *const () as _
                     ; call rax              // getbyte(this, ptr)
                     ; test rax, rax
                     ; jnz  ->io_error       // jmp if rax != 0
@@ -158,7 +158,7 @@ impl BfVM<'_> {
                 PutByte => dynasm!(ops
                     ; mov  rdi, r12         // arg0: this
                     ; mov  rsi, r15         // arg1: ptr
-                    ; mov  rax, QWORD BfVM::putbyte as _
+                    ; mov  rax, QWORD BfVM::putbyte as *const () as _
                     ; call rax              // putbyte(this, ptr)
                     ; test rax, rax
                     ; jnz  ->io_error       // jmp if rax != 0
@@ -189,7 +189,7 @@ impl BfVM<'_> {
             ; xor rax, rax
             ; jmp >exit
             ; -> overflow:
-            ; mov rax, QWORD BfVM::overflow_error as _
+            ; mov rax, QWORD BfVM::overflow_error as *const () as _
             ; call rax
             ; jmp >exit
             ; -> io_error:

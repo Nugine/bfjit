@@ -13,9 +13,9 @@ categories = ["compilers", "command-line-utilities"]
 
 [dependencies]
 thiserror = "2.0.17"
-dynasm = "3.0.1"
-dynasmrt = "3.0.1"
-clap = { version = "4.5.51", features = ["derive"] }
+dynasm = "4.0.1"
+dynasmrt = "4.0.1"
+clap = { version = "4.5.53", features = ["derive"] }
 
 [profile.release]
 debug = "full"
