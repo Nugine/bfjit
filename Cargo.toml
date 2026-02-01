@@ -12,10 +12,10 @@ categories = ["compilers", "command-line-utilities"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-thiserror = "2.0.17"
+thiserror = "2.0.18"
 dynasm = "4.0.1"
 dynasmrt = "4.0.1"
-clap = { version = "4.5.53", features = ["derive"] }
+clap = { version = "4.5.56", features = ["derive"] }
 
 [profile.release]
 debug = "full"
