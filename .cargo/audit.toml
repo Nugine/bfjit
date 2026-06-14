@@ -1,0 +1,10 @@
+# Cargo audit configuration
+# This file configures which security advisories to suppress
+
+[advisories]
+# Suppress RUSTSEC-2026-0173: proc-macro-error2 is unmaintained
+# proc-macro-error2 is a transitive dependency from dynasm v5.0.0
+# The maintainer has confirmed the crate is unmaintained, but there is no
+# suitable replacement in dynasm yet. This is tracked and will be addressed
+# when dynasm updates its dependencies.
+ignore = ["RUSTSEC-2026-0173"]
