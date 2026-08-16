@@ -1,8 +1,9 @@
 [package]
 name = "bfjit"
-version = "0.1.4"
+version = "0.2.0"
 authors = ["Nugine <nugine@foxmail.com>"]
-edition = "2021"
+edition = "2024"
+rust-version = "1.85"
 license = "AGPL-3.0"
 repository = "https://github.com/Nugine/bfjit"
 description = "Brainfuck JIT VM tutorial"
@@ -12,10 +13,10 @@ categories = ["compilers", "command-line-utilities"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-thiserror = "2.0.18"
-dynasm = "5.0.0"
-dynasmrt = "5.0.0"
-clap = { version = "4.5.60", features = ["derive"] }
+thiserror = "2.0.20"
+dynasm = "5.1.0"
+dynasmrt = "5.1.0"
+clap = { version = "4.6", features = ["derive"] }
 
 [profile.release]
 debug = "full"

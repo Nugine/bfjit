@@ -27,10 +27,10 @@ fn vm_error(re: RuntimeError) -> *mut VMError {
 impl BfVM<'_> {
     unsafe extern "sysv64" fn getbyte(this: *mut Self, ptr: *mut u8) -> *mut VMError {
         let mut buf = [0_u8];
-        let this = &mut *this;
+        let this = unsafe { &mut *this };
         match this.input.read(&mut buf) {
             Ok(0) => {}
-            Ok(1) => *ptr = buf[0],
+            Ok(1) => unsafe { *ptr = buf[0] },
             Err(e) => return vm_error(RuntimeError::IO(e)),
             _ => unreachable!(),
         }
@@ -38,8 +38,8 @@ impl BfVM<'_> {
     }
 
     unsafe extern "sysv64" fn putbyte(this: *mut Self, ptr: *const u8) -> *mut VMError {
-        let buf = std::slice::from_ref(&*ptr);
-        let this = &mut *this;
+        let buf = std::slice::from_ref(unsafe { &*ptr });
+        let this = unsafe { &mut *this };
         match this.output.write_all(buf) {
             Ok(()) => ptr::null_mut(),
             Err(e) => vm_error(RuntimeError::IO(e)),

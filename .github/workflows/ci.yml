@@ -31,7 +31,7 @@ jobs:
       fail-fast: false
       matrix:
         toolchain: 
-          - 1.78.0 # MSRV
+          - 1.85.0 # MSRV
           - stable
     steps:
       - uses: actions/checkout@v4
