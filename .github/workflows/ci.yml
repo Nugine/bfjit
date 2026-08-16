@@ -19,11 +19,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: taiki-e/install-action@just
+      - name: Install LLVM 18
+        run: sudo apt-get update && sudo apt-get install -y llvm-18-dev
       - uses: dtolnay/rust-toolchain@nightly
         with:
           components: rustfmt, clippy, miri, rust-src
       - uses: Swatinem/rust-cache@v2
       - run: just ci
+        env:
+          LLVM_SYS_181_PREFIX: /usr/lib/llvm-18
 
   msrv:
     runs-on: ubuntu-latest
