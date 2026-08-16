@@ -16,6 +16,10 @@ thiserror = "2.0.18"
 dynasm = "5.0.0"
 dynasmrt = "5.0.0"
 clap = { version = "4.5.60", features = ["derive"] }
+inkwell = { version = "0.10.0", default-features = false, features = ["llvm18-1-prefer-dynamic", "target-x86"], optional = true }
 
 [profile.release]
 debug = "full"
+
+[features]
+llvm = ["dep:inkwell"]

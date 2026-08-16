@@ -15,6 +15,10 @@ pub enum VMError {
     #[error("Compile: {0}")]
     Compile(#[from] crate::bfir::CompileError),
 
+    #[cfg(feature = "llvm")]
+    #[error("LLVM: {0}")]
+    LLVM(String),
+
     #[error("Runtime: {0}")]
     Runtime(#[from] RuntimeError),
 }
