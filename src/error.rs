@@ -17,7 +17,7 @@ pub enum VMError {
 
     #[cfg(feature = "llvm")]
     #[error("LLVM: {0}")]
-    LLVM(String),
+    Llvm(String),
 
     #[error("Runtime: {0}")]
     Runtime(#[from] RuntimeError),

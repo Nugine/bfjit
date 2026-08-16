@@ -33,7 +33,7 @@ fn vm_error(re: RuntimeError) -> *mut VMError {
 
 #[inline]
 fn llvm_error<E: std::fmt::Display>(e: E) -> VMError {
-    VMError::LLVM(e.to_string())
+    VMError::Llvm(e.to_string())
 }
 
 impl BfLlvmVM<'_> {
